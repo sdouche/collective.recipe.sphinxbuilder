@@ -21,7 +21,8 @@ def setUp(test):
     zc.buildout.testing.install_develop('collective.recipe.sphinxbuilder', test)
 
     # Install any other recipes that should be available in the tests
-    #zc.buildout.testing.install('collective.recipe.foobar', test)
+    for p in ('docutils>=0.4', 'Sphinx', 'Jinja>=1.1', 'Pygments>=0.8'):
+        zc.buildout.testing.install(p, test)
 
 def test_suite():
     suite = unittest.TestSuite((

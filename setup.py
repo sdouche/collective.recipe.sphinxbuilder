@@ -46,7 +46,7 @@ setup(name='collective.recipe.sphinxbuilder',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        ${'License :: OSI Approved :: Zope Public License'},
+        'License :: OSI Approved :: Zope Public License',
         ],
       keywords='buildout sphinx',
       author='Tarek Ziadé',
@@ -58,7 +58,8 @@ setup(name='collective.recipe.sphinxbuilder',
       include_package_data=True,
       zip_safe=False,
       install_requires=['setuptools',
-                        'zc.buildout'
+                        'zc.buildout',
+                        'Sphinx'
                         # -*- Extra requirements: -*-
                         ],
       tests_require=tests_require,
