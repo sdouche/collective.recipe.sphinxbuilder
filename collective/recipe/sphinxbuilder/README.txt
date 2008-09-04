@@ -3,59 +3,54 @@ Supported options
 
 The recipe supports the following options:
 
-.. Note to recipe author!
-   ----------------------
-   For each option the recipe uses you shoud include a description
-   about the purpose of the option, the format and semantics of the
-   values it accepts, whether it is mandatory or optional and what the
-   default value is if it is omitted.
+autobuild
+    If `autobuild` is set to `true`, the Sphinx documentation is generated
+    automatically when buildout is relaunch. Otherwise it is a manual
+    action by the user. Defaults to `false`.
 
-option1
-    Description for ``option1``...
+doc-directory
+    Specify the documentation root. Default to `docs`.    
 
-option2
-    Description for ``option2``...
-
+doc-outputs
+    Multiple-line value that defines what kind of output to produce. 
+    Can be `html`, `latex` or `pdf`. Defaults to `html`.
 
 Example usage
 =============
 
-.. Note to recipe author!
-   ----------------------
-   zc.buildout provides a nice testing environment which makes it
-   relatively easy to write doctests that both demonstrate the use of
-   the recipe and test it.
-   You can find examples of recipe doctests from the PyPI, e.g.
-   
-     http://pypi.python.org/pypi/zc.recipe.egg
-
-   The PyPI page for zc.buildout contains documentation about the test
-   environment.
-
-     http://pypi.python.org/pypi/zc.buildout#testing-support
-
-   Below is a skeleton doctest that you can start with when building
-   your own tests.
-
-We'll start by creating a buildout that uses the recipe::
+The recipe can be used without any options. We'll start by creating a 
+buildout that uses the recipe::
 
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
-    ... parts = test1
+    ... parts = sphinx
     ...
-    ... [test1]
+    ... [sphinx]
     ... recipe = collective.recipe.sphinxbuilder
-    ... option1 = %(foo)s
-    ... option2 = %(bar)s
-    ... """ % { 'foo' : 'value1', 'bar' : 'value2'})
+    ... """) 
 
-Running the buildout gives us::
+Let's run the buildout::
 
-    >>> print 'start', system(buildout) # doctest:+ELLIPSIS
+    >>> print 'start', system(buildout) 
     start...
-    Installing test1.
-    Unused options for test1: 'option2' 'option1'.
+    Installing sphinx.
     <BLANKLINE>
 
+What are we expecting ? 
+
+- a `docs` folder with a Sphinx structure.
+- a script in the `bin` folder to build the docs.
+
+    >>> docs = join(sample_buildout, 'docs')
+    >>> ls(docs)
+    - Makefile
+    d source
+
+    >>> source = join(docs, 'source')
+    >>> ls(source) 
+    d  _static
+    d  _templates
+    -  conf.py
+    -  index.txt
 
