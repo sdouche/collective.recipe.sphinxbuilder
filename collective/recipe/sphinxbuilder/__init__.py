@@ -55,8 +55,10 @@ class Recipe(object):
         self.options['project_fn'] = make_filename(self.options['project'])
         separate = self.options['sep'].upper() in ('Y', 'YES')
         self.options['rsrcdir'] = separate and 'source' or '.'
-        self.options['rbuilddir'] = separate and 'build' or DOT + 'build'
- 
+        self.options['rbuilddir'] = (separate and 'build' or 
+                                     self.options['sphinx-dot'] + 
+                                     'build')
+        self.options['underline'] = '=' * len(self.options['project'])
         lines = [l for l in 
                  self.options.get('doc-outputs', 'html').split('\n')
                  if l.strip() != '']
@@ -69,7 +71,7 @@ class Recipe(object):
             # let's create the initial structure
             conf = QUICKSTART_CONF % self.options
             make = MAKEFILE % self.options
-            master = MASTER_FILE
+            master = MASTER_FILE % self.options
 
             # Makefile
             make_file = join(doc_directory, 'Makefile')
@@ -82,7 +84,7 @@ class Recipe(object):
             self._write_file(conf_file, conf)
 
             # index.txt
-            index_file = join(source_dir, 'index.txt')
+            index_file = join(source_dir, 'index%s' % self.options['suffix'])
             self._write_file(index_file, master)
             
             os.mkdir(join(source_dir, '%stemplates' % DOT))

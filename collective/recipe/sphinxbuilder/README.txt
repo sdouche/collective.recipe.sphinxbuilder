@@ -136,4 +136,26 @@ Finally let's run it::
     ...
     Transcript written in modPlone.ilg.
     <BLANKLINE>
+
+We should have some nice reST file::
+
+    >>> print open(join(docs, 'source', 'index.txt')).read()
+    .. Plone documentation master file, ...
+    <BLANKLINE>
+    Welcome to Plone's documentation!
+    =================================
+    <BLANKLINE>
+    Contents:
+    <BLANKLINE>
+    .. toctree::
+       :maxdepth: 2
+    <BLANKLINE>
+    Indices and tables
+    ==================
+    <BLANKLINE>
+    * :ref:`genindex`
+    * :ref:`modindex`
+    * :ref:`search`
+    <BLANKLINE>
+    <BLANKLINE>
  
