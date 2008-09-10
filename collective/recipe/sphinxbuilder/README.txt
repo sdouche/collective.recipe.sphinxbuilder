@@ -27,7 +27,7 @@ a section like this::
         ...
     
     [sphinx]
-    recipe = collective.recipe.sphinx
+    recipe = collective.recipe.sphinxbuilder
 
 That's it ! Run your buildout and you will get:
 
