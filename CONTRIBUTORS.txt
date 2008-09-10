@@ -1,2 +1,2 @@
-${Tarek Ziadé or ""}, Author
+Tarek Ziadé, Author
 
