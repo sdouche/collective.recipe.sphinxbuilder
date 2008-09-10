@@ -2,37 +2,55 @@
  Define here the css
  */
 body {
- background: black;
+ background: white;
+ color: black;
 }
 
 div.sphinxsidebar {
- background-color: #D7007E;
+ background-color: white;
+ border-right: 1px solid #0089d9;
+ padding-bottom: 10px;
 }
 
 h1, h2, h3 {
- font-color: #D7007E; 
+  color: #0089d9; 
+  background-color: #0089d9;
+  padding: 4px;
 }
 
 div.related {
-  background-color: black;
+  background-color: white;
+  color: #0089d9; 
 }
 
+div.related a, div.footer a {
+  color: black;
+}
+
+div.footer {
+  color: black;
+  border-top: 1px solid #0089d9;
+}
+
+hr {
+ width: 0px; 
+}
 div.section h1, div.section h2, div.section h3, div.section h4 {
- background-color: #D7007E;
- color: white; 
+ background-color: white;
+ color: #0089d9;
+ border-bottom: 1px solid #0089d9; 
 }
 
 div.body h1, div.body h2, div.body h3, div.body h4 {
-     background-color: #D7007E;
-      color: white;
+ background-color: white;
+ color: #0089d9;
 }
 
 div.document {
-    background-color: #D7007E;
-
+  background-color: white;
 }
 
-a {
+a, a:visited {
   color: black;
 }
 

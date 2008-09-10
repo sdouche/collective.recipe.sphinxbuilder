@@ -132,15 +132,14 @@ class Recipe(object):
             # css
             css  = self.options.get('sphinx-css', 
                                     join(static_dir, 'plone.css'))
-
-            shutil.copyfile(css, join(target_static, 
-                                      os.path.split(css)[-1]))
+            target_css =  join(target_static, os.path.split(css)[-1])
+            shutil.copyfile(css, target_css)
            
                         
             for f in ('search.html', 'layout.html', 'modindex.html'):
                 
                 content = open(join(templates, f)).read() 
-                content = content % {'css': css}
+                content = content % {'css': target_css}
                 self._write_file(join(target_templates, f), content)
             
         # now lets create the script used to generate docs
