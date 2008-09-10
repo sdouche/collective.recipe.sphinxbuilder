@@ -1,4 +1,6 @@
-${0.1.0 or "0.0.0"} (xxxx-xx-xx)
-==================
+0.1.0
+=====
 
- - Created recipe with ZopeSkel [${Tarek Ziadé or ""}].
+ - Initial implementation [Tarek Ziadé]
+ - Created recipe with ZopeSkel [Tarek Ziadé].
+

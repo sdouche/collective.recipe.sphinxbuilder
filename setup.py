@@ -67,3 +67,4 @@ setup(name='collective.recipe.sphinxbuilder',
       test_suite = 'collective.recipe.sphinxbuilder.tests.test_docs.test_suite',
       entry_points=entry_points,
       )
+
