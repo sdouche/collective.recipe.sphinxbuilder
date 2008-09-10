@@ -4,6 +4,7 @@ from os.path import join, exists
 from datetime import datetime
 import os
 import sys
+import shutil
 
 from sphinx.quickstart import QUICKSTART_CONF
 from sphinx.quickstart import MAKEFILE
@@ -28,6 +29,8 @@ class Recipe(object):
         root = self.buildout['buildout']['directory']
         bin = self.buildout['buildout']['bin-directory']
         script_name = self.options.get('script-name', self.name) 
+        
+        
         doc_directory = self.options.get('doc-directory', 
                                          join(root, 'docs'))
 
@@ -48,6 +51,7 @@ class Recipe(object):
                           ('version', '1.0'), 
                           ('release', '1.0'),
                           ('dot', DOT),
+                          
                           ('sep', 'yes')):
             bname = 'sphinx-%s' 
             self.options[name] = self.options.get(bname, val)          
@@ -68,8 +72,45 @@ class Recipe(object):
         if not exists(doc_directory):
             os.mkdir(doc_directory)
             
+            current_dir = os.path.dirname(__file__)
+            static_dir = join(current_dir, 'static')
+            templates = join(current_dir, 'templates') 
+            source_dir = join(doc_directory, 'source')
+            dot = self.options['dot']
+            target_templates = join(source_dir, '%stemplates' % dot)
+            target_static = join(source_dir, '%sstatic' % dot)
+            
+            os.mkdir(source_dir)
+            os.mkdir(target_templates)
+            os.mkdir(target_static)
+
+            logo = self.options.get('sphinx-logo',
+                                    join(static_dir, 'plone_logo.png'))
+            # logo 
+            target_logo = join(target_static, os.path.split(logo)[-1])
+            shutil.copyfile(logo, target_logo)
+
+            tex = self.options.get('sphinx-latex-options', 
+                                   join(templates, 'options.tex')) 
+            # latex options
+            target_tex = join(target_static, os.path.split(tex)[-1])
+            shutil.copyfile(tex, target_tex)
+            tex_content = "open('%s').read()" % target_tex
+            
             # let's create the initial structure
             conf = QUICKSTART_CONF % self.options
+
+            # crappy, should provide our own template
+            # but if sphinx one is changed...
+            for source, target in (('#html_logo = None', 
+                                    "html_logo ='%s'" % target_logo),
+                                   ('#latex_logo = None', 
+                                    "latex_logo='%s'" % target_logo),
+                                   ("#latex_preamble = ''",
+                                    "latex_preamble = %s" % tex_content)):
+
+                conf = conf.replace(source, target)
+            
             make = MAKEFILE % self.options
             master = MASTER_FILE % self.options
 
@@ -78,8 +119,6 @@ class Recipe(object):
             self._write_file(make_file, make)
             
             # source dir with conf.py
-            source_dir = join(doc_directory, 'source')
-            os.mkdir(source_dir)
             conf_file = join(source_dir, 'conf.py') 
             self._write_file(conf_file, conf)
 
@@ -87,11 +126,23 @@ class Recipe(object):
             index_file = join(source_dir, 'index%s' % self.options['suffix'])
             self._write_file(index_file, master)
             
-            os.mkdir(join(source_dir, '%stemplates' % DOT))
-            os.mkdir(join(source_dir, '%sstatic' % DOT))  
+            
+            # and the static files
 
-            # we will add goodies here later
+            # css
+            css  = self.options.get('sphinx-css', 
+                                    join(static_dir, 'plone.css'))
 
+            shutil.copyfile(css, join(target_static, 
+                                      os.path.split(css)[-1]))
+           
+                        
+            for f in ('search.html', 'layout.html', 'modindex.html'):
+                
+                content = open(join(templates, f)).read() 
+                content = content % {'css': css}
+                self._write_file(join(target_templates, f), content)
+            
         # now lets create the script used to generate docs
         latex_directory = os.path.join(doc_directory, 'build',
                                        'latex')

@@ -50,6 +50,18 @@ sphinx-sep
     Separate source and build directories. (Y or N) 
     Defaults to Yes.
 
+sphinx-logo 
+    Logo used for html and pdf. Defaults to plone.png 
+    (which is provided by the recipe)
+
+sphinx-css
+    css file used to change Sphinx look. Defaults to 
+    plone.css (which is provided by the recipe)
+
+sphinx-latex-options
+    extra latex options file used in Sphinx. Defaults to options.tex
+    provided by the recipe. 
+
 Example usage
 =============
 
@@ -74,7 +86,7 @@ Let's run the buildout::
 
 What are we expecting ? 
 
-- `docs` folder with a Sphinx structure::
+A `docs` folder with a Sphinx structure::
 
     >>> docs = join(sample_buildout, 'docs')
     >>> ls(docs)
@@ -87,6 +99,16 @@ What are we expecting ?
     d  .templates
     -  conf.py
     -  index.txt
+
+    >>> ls(join(source, '.templates'))
+    -  layout.html
+    -  modindex.html
+    -  search.html
+
+    >>> ls(join(source, '.static'))
+    -  options.tex
+    -  plone.css
+    -  plone_logo.png
 
 A script in the `bin` folder to build the docs::
 
@@ -158,4 +180,11 @@ We should have some nice reST file::
     * :ref:`search`
     <BLANKLINE>
     <BLANKLINE>
- 
+
+And the html rendering should use the plone logo::
+
+    >>> html = open(join(docs, 'build', 'html', 'index.html')).read()
+    >>> 'plone_logo.png' in html
+    True
+
+

@@ -1,0 +1,42 @@
+/*
+ Define here the css
+ */
+body {
+ background: black;
+}
+
+div.sphinxsidebar {
+ background-color: #D7007E;
+}
+
+h1, h2, h3 {
+ font-color: #D7007E; 
+}
+
+div.related {
+  background-color: black;
+}
+
+div.section h1, div.section h2, div.section h3, div.section h4 {
+ background-color: #D7007E;
+ color: white; 
+}
+
+div.body h1, div.body h2, div.body h3, div.body h4 {
+     background-color: #D7007E;
+      color: white;
+}
+
+div.document {
+    background-color: #D7007E;
+
+}
+
+a {
+  color: black;
+}
+
+div.sphinxsidebar a {
+   color: black;
+}
+
