@@ -1,12 +1,53 @@
+What is Sphinx ?
+================
+
+Sphinx is the rising tool in the Python community to build
+documentation. See http://sphinx.pocoo.org.
+
+It is now used for instance by Python. See http://docs.python.org/dev.
+
+Sphinx uses reStructuredText, and can be used to write your buildout-based
+application. This recipe sets everything up for you, so you can
+provide a nice-looking documentation within your buildout, in static html
+or even PDF.
+
+The fact that your documentation is managed like your code
+makes it easy to maintain and change it.
+
+Quick start
+===========
+
+To use the recipe, add in your buildout configuration file
+a section like this::
+
+    [buildout]
+    parts =
+        ...
+        sphinx
+        ...
+    
+    [sphinx]
+    recipe = collective.recipe.sphinx
+
+That's it ! Run your buildout and you will get:
+
+- a new script in the `bin` folder, called  `sphinx`
+- a `docs` directory containing your documentation.
+
+To build your documenation, just run the sphinx script::
+
+    $ bin/sphinx
+
+You will get a shiny Sphinx documenation in `docs/build/htlm`.
+To write your documentation, go in `docs/source`.
+Everytime source is modified, run the script again.
+
+A good starting point to write your documenation is: http://sphinx.pocoo.org/contents.html
+   
 Supported options
 =================
 
 The recipe supports the following options:
-
-autobuild
-    If `autobuild` is set to `true`, the Sphinx documentation is generated
-    automatically when buildout is relaunch. Otherwise it is a manual
-    action by the user. Defaults to `false`.
 
 doc-directory
     Specify the documentation root. Default to `docs`.    
