@@ -16,13 +16,14 @@ optionflags =  (doctest.ELLIPSIS |
 
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
+    # Install any other recipes that should be available in the tests
+    for p in ('docutils>=0.4', 'Sphinx', 'Jinja>=1.1', 'Pygments>=0.8',
+              'zc.recipe.egg'):
+        zc.buildout.testing.install(p, test)
 
     # Install the recipe in develop mode
     zc.buildout.testing.install_develop('collective.recipe.sphinxbuilder', test)
 
-    # Install any other recipes that should be available in the tests
-    for p in ('docutils>=0.4', 'Sphinx', 'Jinja>=1.1', 'Pygments>=0.8'):
-        zc.buildout.testing.install(p, test)
 
 def test_suite():
     suite = unittest.TestSuite((

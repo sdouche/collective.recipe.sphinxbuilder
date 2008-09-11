@@ -34,15 +34,15 @@ That's it ! Run your buildout and you will get:
 - a new script in the `bin` folder, called  `sphinx`
 - a `docs` directory containing your documentation.
 
-To build your documenation, just run the sphinx script::
+To build your documentation, just run the sphinx script::
 
     $ bin/sphinx
 
-You will get a shiny Sphinx documenation in `docs/build/htlm`.
+You will get a shiny Sphinx documenation in `docs/build/html`.
 To write your documentation, go in `docs/source`.
 Everytime source is modified, run the script again.
 
-A good starting point to write your documenation is: http://sphinx.pocoo.org/contents.html
+A good starting point to write your documentation is: http://sphinx.pocoo.org/contents.html.
    
 Supported options
 =================
@@ -123,6 +123,7 @@ Let's run the buildout::
     >>> print 'start', system(buildout) 
     start...
     Installing sphinx.
+    Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
 
 What are we expecting ? 
@@ -157,6 +158,7 @@ A script in the `bin` folder to build the docs::
     >>> ls(bin)
     - buildout
     - sphinx
+    - sphinx-build
 
 The content of the script is a simple shell script::
 

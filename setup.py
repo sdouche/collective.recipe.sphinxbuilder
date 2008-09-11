@@ -31,6 +31,7 @@ long_description = (
    'Download\n'
     '********\n'
     )
+
 entry_point = 'collective.recipe.sphinxbuilder:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 

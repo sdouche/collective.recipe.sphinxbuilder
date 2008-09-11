@@ -5,6 +5,10 @@ from datetime import datetime
 import os
 import sys
 import shutil
+import re
+
+import zc.buildout
+import zc.recipe.egg
 
 from sphinx.quickstart import QUICKSTART_CONF
 from sphinx.quickstart import MAKEFILE
@@ -16,6 +20,7 @@ class Recipe(object):
 
     def __init__(self, buildout, name, options):
         self.buildout, self.name, self.options = buildout, name, options
+        self.egg = zc.recipe.egg.Egg(buildout, options['recipe'], options)
 
     def _write_file(self, name, content):
         f = open(name, 'w')
@@ -112,6 +117,10 @@ class Recipe(object):
                 conf = conf.replace(source, target)
             
             make = MAKEFILE % self.options
+            sphinx_build = join(bin, 'sphinx-build')
+            c = re.compile(r'^SPHINXBUILD .*$', re.M)
+
+            make = c.sub(r'SPHINXBUILD = %s' % sphinx_build, make)
             master = MASTER_FILE % self.options
 
             # Makefile
@@ -155,7 +164,15 @@ class Recipe(object):
 
         make_doc = join('bin', script_name)
         self._write_file(make_doc, '\n'.join(script)) 
-        os.chmod(make_doc, 0777) 
+        os.chmod(make_doc, 0777)
+
+        # ad make sure we have sphinx-build
+        requirements, ws = self.egg.working_set(['Sphinx'])
+
+        zc.buildout.easy_install.scripts(
+                [('sphinx-build', 'sphinx', 'main')],
+                ws, sys.executable, bin)
+
         return (make_doc,)
 
     update = install
