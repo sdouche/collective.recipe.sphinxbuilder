@@ -23,23 +23,25 @@ a section like this::
     [buildout]
     parts =
         ...
-        sphinx
+        sphinx-docs
         ...
     
-    [sphinx]
+    [sphinx-docs]
     recipe = collective.recipe.sphinxbuilder
+
+TODO: need to explain entry_point in custom.app
 
 That's it ! Run your buildout and you will get:
 
-- a new script in the `bin` folder, called  `sphinx`
-- a `docs` directory containing your documentation.
+- a new script in the `bin` folder, called  `sphinx-docs`
+- a `parts/sphinx-docs` directory containing your documentation.
 
 To build your documentation, just run the sphinx script::
 
-    $ bin/sphinx
+    $ bin/sphinx-docs
 
-You will get a shiny Sphinx documenation in `docs/build/html`.
-To write your documentation, go in `docs/source`.
+You will get a shiny Sphinx documenation in `docs/html`.
+REMOVE(need to implement this): To write your documentation, go in `docs/source`.
 Everytime source is modified, run the script again.
 
 A good starting point to write your documentation is: http://sphinx.pocoo.org/contents.html.
@@ -49,59 +51,58 @@ Supported options
 
 The recipe supports the following options:
 
-doc-directory
-    Specify the documentation root. Default to `docs`.    
+TODO: check that here are listed all options form sphinxbuilder conf.py 
 
-doc-outputs
+docs-directory
+    Specify the build documentation root. Default to `docs`.    
+
+outputs
     Multiple-line value that defines what kind of output to produce. 
     Can be `html`, `latex` or `pdf`. Defaults to `html`.
 
 script-name
     The name of the script generated. Defaults to the name of the section.    
 
-sphinx-project
+project
     The name of the project used in Plone. Defaults to Plone.
 
-sphinx-extensions
+extensions
     Sphinx extensions in use. Defaults to none. 
 
-sphinx-master 
-    Name of the index file. Defaults to index.
+master 
+    Name of the index file. Defaults to `index`.
 
-sphinx-year
+year
     Year of the project. Defaults to current year.
 
-sphinx-suffix
+suffix
     File extensions used for reST file. Defaults to .txt
 
-sphinx-author
+author
     Author. Defaults to Plone Community. 
 
-sphinx-version
+version
     Version. Defaults to 1.0.
 
-sphinx-release
+release
     Release. Defaults to 1.0.
 
-sphinx-dot 
+dot 
     The prefix of the static and template directory.
     Defaults to '.' under Linux and '_' under Windows.
 
-sphinx-sep
-    Separate source and build directories. (Y or N) 
-    Defaults to Yes.
-
-sphinx-logo 
+logo 
     Logo used for html and pdf. Defaults to plone.png 
     (which is provided by the recipe)
 
-sphinx-css
+css
     css file used to change Sphinx look. Defaults to 
     plone.css (which is provided by the recipe)
 
-sphinx-latex-options
+latex_options
     extra latex options file used in Sphinx. Defaults to options.tex
     provided by the recipe. 
+
 
 Example usage
 =============
@@ -112,9 +113,9 @@ buildout that uses the recipe::
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
-    ... parts = sphinx
+    ... parts = sphinxbuilder
     ...
-    ... [sphinx]
+    ... [sphinxbuilder]
     ... recipe = collective.recipe.sphinxbuilder
     ... """) 
 
@@ -122,7 +123,7 @@ Let's run the buildout::
 
     >>> print 'start', system(buildout) 
     start...
-    Installing sphinx.
+    Installing sphinxbuilder.
     Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
 
@@ -133,9 +134,8 @@ A `docs` folder with a Sphinx structure::
     >>> docs = join(sample_buildout, 'docs')
     >>> ls(docs)
     - Makefile
-    d source
 
-    >>> source = join(docs, 'source')
+    >>> source = join(sample_buildout, 'parts', 'sphinxbuilder')
     >>> ls(source) 
     d  .static
     d  .templates
@@ -157,38 +157,42 @@ A script in the `bin` folder to build the docs::
     >>> bin = join(sample_buildout, 'bin')
     >>> ls(bin)
     - buildout
-    - sphinx
     - sphinx-build
+    - sphinxbuilder
 
 The content of the script is a simple shell script::
 
-    >>> script = join(sample_buildout, 'bin', 'sphinx')
+    >>> script = join(sample_buildout, 'bin', 'sphinxbuilder')
     >>> print open(script).read()
     cd ...docs
     make html
+    
+    >>> print 'start', system(script)
+    start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
+    ...
    
 If we want `latex` and `pdf`, we need to explicitly define it::
 
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
-    ... parts = sphinx
+    ... parts = sphinxbuilder
     ...
-    ... [sphinx]
+    ... [sphinxbuilder]
     ... recipe = collective.recipe.sphinxbuilder
-    ... doc-outputs =
+    ... outputs =
     ...     html
     ...     latex
     ...     pdf
     ... """) 
     >>> print 'start', system(buildout)
-    start...
-    Installing sphinx.
+    start Uninstalling sphinxbuilder.
+    Installing sphinxbuilder.
     <BLANKLINE>
 
 Let's see our script now::
     
-    >>> print open(script).read() 
+    >>> cat(script)
     cd ...docs
     make html
     make latex
@@ -197,14 +201,14 @@ Let's see our script now::
 Finally let's run it::
 
     >>> print 'start', system(script)
-    start mkdir -p build/html build/doctrees
+    start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
     ...
     Transcript written in modPlone.ilg.
     <BLANKLINE>
 
 We should have some nice reST file::
 
-    >>> print open(join(docs, 'source', 'index.txt')).read()
+    >>> print open(join(sample_buildout, 'parts', 'sphinxbuilder', 'index.txt')).read()
     .. Plone documentation master file, ...
     <BLANKLINE>
     Welcome to Plone's documentation!
@@ -226,7 +230,7 @@ We should have some nice reST file::
 
 And the html rendering should use the plone logo::
 
-    >>> html = open(join(docs, 'build', 'html', 'index.html')).read()
+    >>> html = open(join(docs, 'html', 'index.html')).read()
     >>> 'plone_logo.png' in html
     True
 

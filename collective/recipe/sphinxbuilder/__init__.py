@@ -1,26 +1,209 @@
 # -*- coding: utf-8 -*-
 """Recipe sphinxbuilder"""
-from os.path import join, exists
-from datetime import datetime
+
 import os
+import re
 import sys
 import shutil
-import re
-
 import zc.buildout
 import zc.recipe.egg
+
+
 
 from sphinx.quickstart import QUICKSTART_CONF
 from sphinx.quickstart import MAKEFILE
 from sphinx.quickstart import MASTER_FILE
 from sphinx.util import make_filename
 
+ENTRY_POINT = 'collective.recipe.sphinxbuilder'
+
+
 class Recipe(object):
     """zc.buildout recipe"""
+    
 
     def __init__(self, buildout, name, options):
         self.buildout, self.name, self.options = buildout, name, options
         self.egg = zc.recipe.egg.Egg(buildout, options['recipe'], options)
+
+        self.script_name = self.options.get('script-name', self.name)
+        self.outputs = [output.strip() for output in 
+                            self.options.get('outputs', 'html').split('\n')
+                            if output.strip() != '']
+        self.buildout_directory = self.buildout['buildout']['directory']
+        self.bin_directory = self.buildout['buildout']['bin-directory']
+        self.parts_directory = self.buildout['buildout']['parts-directory']
+        self.source_directory = os.path.join(self.parts_directory, self.name)
+        self.build_directory = self.options.get('docs-directory',
+                               os.path.join(self.buildout_directory, 'docs'))
+        self.latex_directory = os.path.join(self.build_directory, 'latex')
+
+
+    def install(self):
+        """Installer"""
+
+        # CREATE NEEDED DIRECTORIES
+        if not os.path.exists(self.source_directory):
+            os.mkdir(self.source_directory)
+        if not os.path.exists(self.build_directory):
+            os.mkdir(self.build_directory)
+
+        # EXTRA PATH IN working_set
+        distributions, ws = self.egg.working_set([ENTRY_POINT])
+        
+        # ENTRY POINTS 
+        if ENTRY_POINT not in distributions:
+            distributions.append(ENTRY_POINT)
+        conf_options, entry_points = {}, []
+        for dist in reversed(distributions):
+
+            # FIND ENTRY POINT
+            entry_point = ws.require(dist)[0].get_entry_map(ENTRY_POINT)
+            if 'default' not in entry_point.keys():
+                continue
+            entry_point = entry_point['default'].load()
+            entry_point_path = os.path.dirname(entry_point.__file__)
+            entry_points.append(entry_point_path)
+
+            # IMPORT conf.py OPTIONS FROM ENTRY POINT
+            dist_conf = self._import_conf(entry_point.__name__)
+            if dist_conf:
+                for option in ['project', 'extensions', 'exclude_trees',
+                               'author', 'copyright', 'version', 'release',
+                               'master', 'suffix', 'dot', 'now', 'year',
+                               'logo', 'latex_options']:
+                    conf_options[option] = getattr(dist_conf, option,
+                                           conf_options.get(option, ''))
+                    # TODO: extensions is list like option 
+                    # we should append from parent entry points
+
+
+        # override options with buildout configuration
+        for option, default in conf_options.items():
+            self.options[option] = self.options.get(option, default)
+
+        # IMPORT TEMPLATES, STATIC FILES
+        for path in entry_points:
+            self._import_templates(os.path.join(path, 'templates'))
+            self._import_static(os.path.join(path, 'static'))
+            self._import_source(os.path.join(path, 'source'))
+       
+        # OVERRIDE SOURCE FILES
+        # TODO: should make it optional and provided through 'custom_source' option
+        # TODO: this should be run with script_name script
+        self._import_source(os.path.join(self.build_directory, 'source'))
+        self._import_static(os.path.join(self.build_directory, 'source', 'static'))
+        self._import_static(os.path.join(self.build_directory, 'source', 'templates'))
+
+        # CREATE conf.py FILE
+        self.options['project_fn'] = make_filename(self.options['project'])
+        self.options['project_doc'] = self.options['project']
+        self.options['underline'] = '='*len(self.options['project'])
+        self.options['rsrcdir'] = self.source_directory
+        self.options['rbuilddir'] = self.build_directory
+        # crappy, should provide our own template
+        # but if sphinx one is changed...
+        logo = os.path.join(
+                self.source_directory,
+                '%sstatic' % self.options['dot'],
+                self.options['logo'])
+        tex = "open('%s').read()" % os.path.join(
+                self.source_directory,
+                '%sstatic' % self.options['dot'],
+                self.options['latex_options'])
+        conf = QUICKSTART_CONF % self.options
+        for source, target in (('#html_logo = None', "html_logo ='%s'" % logo),
+                               ('#latex_logo = None', "latex_logo='%s'" % logo),
+                               ("#latex_preamble = ''", "latex_preamble = %s" % tex)):
+            conf = conf.replace(source, target)
+        self._write_file(os.path.join(self.source_directory, 'conf.py'), conf)
+
+        # MAKEFILE
+        c = re.compile(r'^SPHINXBUILD .*$', re.M)
+        make = c.sub(r'SPHINXBUILD = %s' % (
+               os.path.join(self.bin_directory, 'sphinx-build')),
+               MAKEFILE % self.options)
+        self._write_file(os.path.join(self.build_directory, 'Makefile'), make)
+
+
+        # IF THERE IS NO MASTER FILE WE PROVIDE SPHINX DEFAULT ONE
+        if not os.path.exists(os.path.join(self.source_directory,
+                              'index%s' % self.options['suffix'])):
+            self._write_file(os.path.join(self.source_directory,
+                                          'index%s' % self.options['suffix']),
+                             MASTER_FILE % self.options)
+
+        # SPHINXBUILDER SCRIPT
+        script = ['cd %s' % self.build_directory]
+        if 'html' in self.outputs:
+            script.append('make html')
+        if 'latex' in self.outputs:
+            script.append('make latex')
+        if 'pdf' in self.outputs:
+            script.append('make latex && cd %s && make' % self.latex_directory)
+        sphinxbuilder_script = os.path.join(self.bin_directory, self.script_name)
+        self._write_file(sphinxbuilder_script, '\n'.join(script))
+        os.chmod(sphinxbuilder_script, 0777)
+
+        # SPHINX-BUILD
+        requirements, ws = self.egg.working_set(['Sphinx'])
+        extra_paths = self.options.get('extra_paths', None)
+        if extra_paths:
+            zc.buildout.easy_install.scripts(
+                    [('sphinx-build', 'sphinx', 'main')], ws,
+                    self.buildout[self.buildout['buildout']['python']]['executable'],
+                    self.bin_directory,
+                    extra_paths = extra_paths.split())
+        else:
+            zc.buildout.easy_install.scripts(
+                    [('sphinx-build', 'sphinx', 'main')], ws,
+                    self.buildout[self.buildout['buildout']['python']]['executable'],
+                    self.bin_directory)
+
+        return [self.source_directory, sphinxbuilder_script,]
+    
+    update = install
+
+    def _import_conf(self, name):
+        try:
+            mod = __import__(name+'.conf')
+            components = name.split('.')
+            for comp in components[1:]:
+                mod = getattr(mod, comp, None)
+            return getattr(mod, 'conf', None)
+        except:
+            return None
+
+    def _import_templates(self, path):
+        self._import_folder('templates', path)
+
+    def _import_static(self, path):
+        self._import_folder('static', path)
+
+    def _import_folder(self, folder, path):
+        target = os.path.join(self.source_directory,
+                              self.options['dot']+folder)
+        if not os.path.exists(target):
+            os.mkdir(target)
+        for root, dirs, files in os.walk(path):
+            for _file in files:
+                shutil.copyfile(os.path.join(root, _file),
+                                os.path.join(target, _file))
+
+    def _import_source(self, path, target=None):
+        if target == None:
+            target = self.source_directory
+        if not os.path.exists(target):
+            os.mkdir(target)
+        for root, dirs, files in os.walk(path):
+            for _file in files:
+                if _file.endswith(self.options['suffix']):
+                    shutil.copyfile(os.path.join(root, _file),
+                                    os.path.join(target, _file))
+            for _dir in dirs:
+                if _dir not in ['templates', 'static']:
+                    self._import_source(os.path.join(root, _dir),
+                                        os.path.join(target, _dir))
 
     def _write_file(self, name, content):
         f = open(name, 'w')
@@ -28,152 +211,4 @@ class Recipe(object):
             f.write(content)
         finally:
             f.close()
-
-    def install(self):
-        """Installer"""
-        root = self.buildout['buildout']['directory']
-        bin = self.buildout['buildout']['bin-directory']
-        script_name = self.options.get('script-name', self.name) 
-        
-        
-        doc_directory = self.options.get('doc-directory', 
-                                         join(root, 'docs'))
-
-        if sys.platform == 'win32':
-            DOT = '_'
-        else:
-            DOT = '.'
-
-        self.options['now'] = datetime.now().ctime() 
-        year = datetime.now().year      
-        suffix = '.txt'
-        for name, val in (('project', 'Plone'),  
-                          ('extensions', ''), 
-                          ('master', 'index'),
-                          ('year', str(year)),
-                          ('suffix', suffix), 
-                          ('author', 'Plone Community'),
-                          ('version', '1.0'), 
-                          ('release', '1.0'),
-                          ('dot', DOT),
-                          
-                          ('sep', 'yes')):
-            bname = 'sphinx-%s' 
-            self.options[name] = self.options.get(bname, val)          
-
-        self.options['project_fn'] = make_filename(self.options['project'])
-        separate = self.options['sep'].upper() in ('Y', 'YES')
-        self.options['rsrcdir'] = separate and 'source' or '.'
-        self.options['rbuilddir'] = (separate and 'build' or 
-                                     self.options['sphinx-dot'] + 
-                                     'build')
-        self.options['underline'] = '=' * len(self.options['project'])
-        lines = [l for l in 
-                 self.options.get('doc-outputs', 'html').split('\n')
-                 if l.strip() != '']
-
-        doc_outputs = [e.strip() for e in lines]
-
-        if not exists(doc_directory):
-            os.mkdir(doc_directory)
-            
-            current_dir = os.path.dirname(__file__)
-            static_dir = join(current_dir, 'static')
-            templates = join(current_dir, 'templates') 
-            source_dir = join(doc_directory, 'source')
-            dot = self.options['dot']
-            target_templates = join(source_dir, '%stemplates' % dot)
-            target_static = join(source_dir, '%sstatic' % dot)
-            
-            os.mkdir(source_dir)
-            os.mkdir(target_templates)
-            os.mkdir(target_static)
-
-            logo = self.options.get('sphinx-logo',
-                                    join(static_dir, 'plone_logo.png'))
-            # logo 
-            target_logo = join(target_static, os.path.split(logo)[-1])
-            shutil.copyfile(logo, target_logo)
-
-            tex = self.options.get('sphinx-latex-options', 
-                                   join(templates, 'options.tex')) 
-            # latex options
-            target_tex = join(target_static, os.path.split(tex)[-1])
-            shutil.copyfile(tex, target_tex)
-            tex_content = "open('%s').read()" % target_tex
-            
-            # let's create the initial structure
-            conf = QUICKSTART_CONF % self.options
-
-            # crappy, should provide our own template
-            # but if sphinx one is changed...
-            for source, target in (('#html_logo = None', 
-                                    "html_logo ='%s'" % target_logo),
-                                   ('#latex_logo = None', 
-                                    "latex_logo='%s'" % target_logo),
-                                   ("#latex_preamble = ''",
-                                    "latex_preamble = %s" % tex_content)):
-
-                conf = conf.replace(source, target)
-            
-            make = MAKEFILE % self.options
-            sphinx_build = join(bin, 'sphinx-build')
-            c = re.compile(r'^SPHINXBUILD .*$', re.M)
-
-            make = c.sub(r'SPHINXBUILD = %s' % sphinx_build, make)
-            master = MASTER_FILE % self.options
-
-            # Makefile
-            make_file = join(doc_directory, 'Makefile')
-            self._write_file(make_file, make)
-            
-            # source dir with conf.py
-            conf_file = join(source_dir, 'conf.py') 
-            self._write_file(conf_file, conf)
-
-            # index.txt
-            index_file = join(source_dir, 'index%s' % self.options['suffix'])
-            self._write_file(index_file, master)
-            
-            
-            # and the static files
-
-            # css
-            css  = self.options.get('sphinx-css', 
-                                    join(static_dir, 'plone.css'))
-            target_css =  join(target_static, os.path.split(css)[-1])
-            shutil.copyfile(css, target_css)
-           
-                        
-            for f in ('search.html', 'layout.html', 'modindex.html'):
-                
-                content = open(join(templates, f)).read() 
-                content = content % {'css': target_css}
-                self._write_file(join(target_templates, f), content)
-            
-        # now lets create the script used to generate docs
-        latex_directory = os.path.join(doc_directory, 'build',
-                                       'latex')
-        script = ['cd %s' % doc_directory]
-        if 'html' in doc_outputs:
-            script.append('make html')
-        if 'latex' in doc_outputs:
-            script.append('make latex')
-        if 'pdf' in doc_outputs:
-            script.append('make latex && cd %s && make' % latex_directory)
-
-        make_doc = join('bin', script_name)
-        self._write_file(make_doc, '\n'.join(script)) 
-        os.chmod(make_doc, 0777)
-
-        # ad make sure we have sphinx-build
-        requirements, ws = self.egg.working_set(['Sphinx'])
-
-        zc.buildout.easy_install.scripts(
-                [('sphinx-build', 'sphinx', 'main')],
-                ws, sys.executable, bin)
-
-        return (make_doc,)
-
-    update = install
 

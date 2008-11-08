@@ -12,7 +12,7 @@ div.sphinxsidebar {
  padding-bottom: 10px;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   color: #0089d9; 
   background-color: #0089d9;
   padding: 4px;
@@ -57,4 +57,18 @@ a, a:visited {
 div.sphinxsidebar a {
    color: black;
 }
-
+div.sphinxsidebarwrapper {
+  padding: 10px 0 0;
+}
+div.sphinxsidebar h3 {
+  padding: 0.1em 0.5em;
+}
+div.sphinxsidebar h4 {
+  padding: 0.1em 0.5em;
+}
+div.sphinxsidebar ul {
+  margin: 1em 1em 1em 1.5em;
+}
+img.logo {
+  margin-left: 1em;
+}

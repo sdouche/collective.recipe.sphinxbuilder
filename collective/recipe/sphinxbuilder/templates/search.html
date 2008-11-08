@@ -1,10 +1,10 @@
-{%% extends '!search.html' %%}
+{% extends '!search.html' %}
 
-{%% block extrahead %%}
+{% block extrahead %}
     <script type="text/javascript" src="{{ pathto('_static/searchtools.js', 1) }}"></script>
    <link rel="stylesheet"
-    href="{{ pathto('%(css)s', 1) }}"
+    href="{{ pathto('plone.css', 1) }}"
     type="text/css" />
 
-{%% endblock %%}
+{% endblock %}
 
