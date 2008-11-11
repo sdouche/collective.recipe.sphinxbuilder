@@ -4,7 +4,8 @@ What is Sphinx ?
 Sphinx is the rising tool in the Python community to build
 documentation. See http://sphinx.pocoo.org.
 
-It is now used for instance by Python. See http://docs.python.org/dev.
+It is now used for instance by Python. See http://docs.python.org/dev and many
+others 
 
 Sphinx uses reStructuredText, and can be used to write your buildout-based
 application. This recipe sets everything up for you, so you can
@@ -23,35 +24,59 @@ a section like this::
     [buildout]
     parts =
         ...
-        sphinx-docs
+        sphinxbuilder
         ...
     
-    [sphinx-docs]
+    [sphinxbuilder]
     recipe = collective.recipe.sphinxbuilder
 
-TODO: need to explain entry_point in custom.app
 
 That's it ! Run your buildout and you will get:
 
-- a new script in the `bin` folder, called  `sphinx-docs`
-- a `parts/sphinx-docs` directory containing your documentation.
+- a new script in the `bin` folder, called  `sphinxbuilder`
+- a `parts/sphinxbuilder` directory containing your documentation.
 
 To build your documentation, just run the sphinx script::
 
-    $ bin/sphinx-docs
+    $ bin/sphinxbuilder
 
 You will get a shiny Sphinx documenation in `docs/html`.
-REMOVE(need to implement this): To write your documentation, go in `docs/source`.
-Everytime source is modified, run the script again.
+To write your documentation, go in `docs/source`, if there is none create it.
+Everytime source is modified, run the buildout and script again.
 
-A good starting point to write your documentation is: http://sphinx.pocoo.org/contents.html.
-   
+A good starting point to write your documentation is: 
+http://sphinx.pocoo.org/contents.html.
+
+Providing documentation from packages
+=====================================
+
+You can also include documentation from packages by providing entry_point.
+Entry points will be picked by order you provide in eggs buildout option.::
+
+    setup(
+        ...
+        entry_points = dict('collective.recipe.sphinxbuilder':
+                                'default: custom.package.docs')
+        ...
+        )
+
+With this entry point declaration above we declared that there is a 'docs'
+module in 'custom.package' which can contain:
+    - conf.py
+        Default values for sphinx. You can still override them with
+        buildout configuration.
+    - static directory
+        Override default static file/s.
+    - template directory
+        Override default template file/s.
+    - source files
+        Root of our entry point module will be searched for any source files,
+        depending on what suffix you choose.
+
 Supported options
 =================
 
 The recipe supports the following options:
-
-TODO: check that here are listed all options form sphinxbuilder conf.py 
 
 docs-directory
     Specify the build documentation root. Default to `docs`.    

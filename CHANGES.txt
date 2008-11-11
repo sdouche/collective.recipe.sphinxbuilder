@@ -1,6 +1,11 @@
-0.1.2 (unreleased)
+0.2.0 (2008-11-11)
 ==================
 
+ - source tree generated every time under parts/<buildout-section-name> [Rok Garbas]
+ - finds conf options, source, static and template files using entry_point
+   'collective.recipe.sphinxbuilder' [Rok Garbas]
+ - custom source folder at docs/source [Rok Garbas]
+ - build section moved to docs/html, docs/latex [Rok Garbas]
 
 0.1.1 (2008-09-11)
 ==================
