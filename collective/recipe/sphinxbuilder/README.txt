@@ -62,16 +62,17 @@ Entry points will be picked by order you provide in eggs buildout option.::
 
 With this entry point declaration above we declared that there is a 'docs'
 module in 'custom.package' which can contain:
-    - conf.py
-        Default values for sphinx. You can still override them with
-        buildout configuration.
-    - static directory
-        Override default static file/s.
-    - template directory
-        Override default template file/s.
-    - source files
-        Root of our entry point module will be searched for any source files,
-        depending on what suffix you choose.
+
+ - conf.py
+   Default values for sphinx. You can still override them with
+   buildout configuration.
+ - static directory
+   Override default static file/s.
+ - template directory
+   Override default template file/s.
+ - source files
+   Root of our entry point module will be searched for any source files,
+   depending on what suffix you choose.
 
 Supported options
 =================
