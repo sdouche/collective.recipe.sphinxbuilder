@@ -129,6 +129,12 @@ latex_options
     extra latex options file used in Sphinx. Defaults to options.tex
     provided by the recipe. 
 
+extra_paths
+    Extra paths to be inserted into sys.path.
+
+product_directories
+    Extra product directories to be extend the Products namespace for
+    old-style Zope Products.
 
 Example usage
 =============

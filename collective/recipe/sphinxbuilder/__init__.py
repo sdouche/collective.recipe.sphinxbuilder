@@ -37,7 +37,7 @@ class Recipe(object):
         self.build_directory = self.options.get('docs-directory',
                                os.path.join(self.buildout_directory, 'docs'))
         self.latex_directory = os.path.join(self.build_directory, 'latex')
-
+        self.product_directories = self.options.get('product_directories', '')
 
     def install(self):
         """Installer"""
@@ -145,6 +145,15 @@ class Recipe(object):
         self._write_file(sphinxbuilder_script, '\n'.join(script))
         os.chmod(sphinxbuilder_script, 0777)
 
+        # Setup extra Products namespace for old-style Zope products.
+        initialization = ''
+        product_directories = [d.strip() for d in self.product_directories.split()]
+        if product_directories:
+            initialization = 'import Products;'
+            for product_directory in product_directories:
+                initialization += ('Products.__path__.append(r"%s");' % 
+                                   product_directory)
+
         # SPHINX-BUILD
         requirements, ws = self.egg.working_set(['Sphinx'])
         extra_paths = self.options.get('extra_paths', None)
@@ -153,12 +162,14 @@ class Recipe(object):
                     [('sphinx-build', 'sphinx', 'main')], ws,
                     self.buildout[self.buildout['buildout']['python']]['executable'],
                     self.bin_directory,
-                    extra_paths = extra_paths.split())
+                    extra_paths = extra_paths.split(),
+                    initialization = initialization)
         else:
             zc.buildout.easy_install.scripts(
                     [('sphinx-build', 'sphinx', 'main')], ws,
                     self.buildout[self.buildout['buildout']['python']]['executable'],
-                    self.bin_directory)
+                    self.bin_directory,
+                    initialization = initialization)
 
         return [self.source_directory, sphinxbuilder_script,]
     
