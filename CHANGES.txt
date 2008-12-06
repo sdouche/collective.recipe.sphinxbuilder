@@ -1,11 +1,13 @@
-0.2.2 (2008-12-06)
+0.5.0 (2008-12-06)
 ==================
+
  - Making it compatible with latest sphinx 0.5 [Rok Garbas]
  - Allow for specifying 'product_directories' in order to be able to
    document old-style Zope Products. [Sidnei]
 
 0.2.1 (2008-11-18)
 ==================
+
  - Manifest file fixed and making fix release [Rok Garbas]
 
 0.2.0 (2008-11-11)
