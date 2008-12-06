@@ -71,7 +71,8 @@ class Recipe(object):
                 for option in ['project', 'extensions', 'exclude_trees',
                                'author', 'copyright', 'version', 'release',
                                'master', 'suffix', 'dot', 'now', 'year',
-                               'logo', 'latex_options']:
+                               'logo', 'latex_options', 'project_doc_texescaped',
+                               'author_texescaped']:
                     conf_options[option] = getattr(dist_conf, option,
                                            conf_options.get(option, ''))
                     # TODO: extensions is list like option 

@@ -16,4 +16,5 @@ now             = datetime.now().ctime()
 year            = str(datetime.now().year)
 logo            = 'logo.png'
 latex_options   = 'options.tex'
-
+project_doc_texescaped = ''
+author_texescaped = ''

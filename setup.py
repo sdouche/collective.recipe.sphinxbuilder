@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.2.1'
+version = '0.2.2'
 
 long_description = (
     read('README.txt')
@@ -70,7 +70,7 @@ setup(name='collective.recipe.sphinxbuilder',
                         'zc.buildout',
                         'zc.recipe.egg',
                         'docutils',
-                        'Sphinx'
+                        'Sphinx==0.5'
                         ],
       tests_require=tests_require,
       extras_require=dict(tests=tests_require),
