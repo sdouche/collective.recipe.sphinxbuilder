@@ -1,4 +1,5 @@
  * Tarek Ziade, Author
  * Rok Garbas, likes mandarines
  * Sidnei da Silva
+ * Hans-Peter Locher, aka mr_savage
 

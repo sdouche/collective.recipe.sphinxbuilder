@@ -94,7 +94,7 @@ class Recipe(object):
         # TODO: this should be run with script_name script
         self._import_source(os.path.join(self.build_directory, 'source'))
         self._import_static(os.path.join(self.build_directory, 'source', 'static'))
-        self._import_static(os.path.join(self.build_directory, 'source', 'templates'))
+        self._import_templates(os.path.join(self.build_directory, 'source', 'templates'))
 
         # CREATE conf.py FILE
         self.options['project_fn'] = make_filename(self.options['project'])

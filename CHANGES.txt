@@ -1,3 +1,9 @@
+trunk (unreleased)
+==================
+
+  - fix issue, override source files in the templates directory
+    using _import_templates [mr_savage]
+
 0.5.0 (2008-12-06)
 ==================
 
