@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.5.0'
+version = '0.5.1'
 
 long_description = (
     read('README.txt')
@@ -38,9 +38,7 @@ long_description = (
     )
 
 entry_point = 'collective.recipe.sphinxbuilder:Recipe'
-entry_point2 = 'collective.recipe.sphinxbuilder'
-entry_points = {"zc.buildout": ["default = %s" % entry_point],
-                "collective.recipe.sphinxbuilder": ["default = %s" % entry_point2]}
+entry_points = {"zc.buildout": ["default = %s" % entry_point],}
 
 tests_require=['zope.testing', 'zc.buildout']
 
@@ -70,7 +68,7 @@ setup(name='collective.recipe.sphinxbuilder',
                         'zc.buildout',
                         'zc.recipe.egg',
                         'docutils',
-                        'Sphinx==0.5'
+                        'Sphinx==0.5.1'
                         ],
       tests_require=tests_require,
       extras_require=dict(tests=tests_require),

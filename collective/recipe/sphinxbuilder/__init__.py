@@ -7,117 +7,95 @@ import sys
 import shutil
 import zc.buildout
 import zc.recipe.egg
-
-
+from datetime import datetime
 
 from sphinx.quickstart import QUICKSTART_CONF
 from sphinx.quickstart import MAKEFILE
 from sphinx.quickstart import MASTER_FILE
 from sphinx.util import make_filename
 
-ENTRY_POINT = 'collective.recipe.sphinxbuilder'
-
 
 class Recipe(object):
     """zc.buildout recipe"""
-    
 
     def __init__(self, buildout, name, options):
         self.buildout, self.name, self.options = buildout, name, options
         self.egg = zc.recipe.egg.Egg(buildout, options['recipe'], options)
-
-        self.script_name = self.options.get('script-name', self.name)
-        self.outputs = [output.strip() for output in 
-                            self.options.get('outputs', 'html').split('\n')
-                            if output.strip() != '']
         self.buildout_directory = self.buildout['buildout']['directory']
         self.bin_directory = self.buildout['buildout']['bin-directory']
         self.parts_directory = self.buildout['buildout']['parts-directory']
-        self.source_directory = os.path.join(self.parts_directory, self.name)
-        self.build_directory = self.options.get('docs-directory',
-                               os.path.join(self.buildout_directory, 'docs'))
+
+        self.script_name = options.get('script-name', name)
+        self.product_directories = options.get('product_directories', '')
+        self.outputs = [o.strip() for o in options.get('outputs', 'html').split() if o.strip()!='']
+        self.dot = sys.platform=='win32' and '_' or '.'
+
+        self.build_directory = options.get('build_directory', os.path.join(self.buildout_directory, 'docs'))
+        self.source_directory = options.get('source', os.path.join(self.build_directory, 'source'))
         self.latex_directory = os.path.join(self.build_directory, 'latex')
-        self.product_directories = self.options.get('product_directories', '')
 
     def install(self):
         """Installer"""
 
         # CREATE NEEDED DIRECTORIES
-        if not os.path.exists(self.source_directory):
-            os.mkdir(self.source_directory)
+        layout_options = {}
         if not os.path.exists(self.build_directory):
             os.mkdir(self.build_directory)
+        if not os.path.isabs(self.source_directory):
+            self.source_directory = self._resolve_path(self.source_directory)
+        else:
+            if not os.path.exists(self.source_directory):
+                os.mkdir(self.source_directory)
+            # LAYOUT (apply starting layout only if we are in "develop" mode)
+            if 'layout' in self.options:
+                self.layout_directory = self._resolve_path(self.options['layout'])
+                for item in ['static', 'templates']:
+                    src_path = os.path.join(self.layout_directory, item)
+                    dst_path = os.path.join(self.source_directory, self.dot+item)
+                    if os.path.exists(src_path) and not os.path.exists(dst_path):
+                        shutil.copytree(src_path, dst_path)
+                eval(compile(open(os.path.join(self.layout_directory, 'conf.py')).read(),
+                        '', 'exec'), globals(), layout_options)
+            for item in ['static', 'templates']:
+                path = os.path.join(self.source_directory, self.dot+item)
+                if not os.path.exists(path): os.mkdir(path)
 
-        # EXTRA PATH IN working_set
-        distributions, ws = self.egg.working_set([ENTRY_POINT])
-        
-        # ENTRY POINTS 
-        if ENTRY_POINT not in distributions:
-            distributions.append(ENTRY_POINT)
-        conf_options, entry_points = {}, []
-        for dist in reversed(distributions):
-
-            # FIND ENTRY POINT
-            entry_point = ws.require(dist)[0].get_entry_map(ENTRY_POINT)
-            if 'default' not in entry_point.keys():
-                continue
-            entry_point = entry_point['default'].load()
-            entry_point_path = os.path.dirname(entry_point.__file__)
-            entry_points.append(entry_point_path)
-
-            # IMPORT conf.py OPTIONS FROM ENTRY POINT
-            dist_conf = self._import_conf(entry_point.__name__)
-            if dist_conf:
-                for option in ['project', 'extensions', 'exclude_trees',
-                               'author', 'copyright', 'version', 'release',
-                               'master', 'suffix', 'dot', 'now', 'year',
-                               'logo', 'latex_options', 'project_doc_texescaped',
-                               'author_texescaped']:
-                    conf_options[option] = getattr(dist_conf, option,
-                                           conf_options.get(option, ''))
-                    # TODO: extensions is list like option 
-                    # we should append from parent entry points
-
-
-        # override options with buildout configuration
-        for option, default in conf_options.items():
-            self.options[option] = self.options.get(option, default)
-
-        # IMPORT TEMPLATES, STATIC FILES
-        for path in entry_points:
-            self._import_templates(os.path.join(path, 'templates'))
-            self._import_static(os.path.join(path, 'static'))
-            self._import_source(os.path.join(path, 'source'))
-       
-        # OVERRIDE SOURCE FILES
-        # TODO: should make it optional and provided through 'custom_source' option
-        # TODO: this should be run with script_name script
-        self._import_source(os.path.join(self.build_directory, 'source'))
-        self._import_static(os.path.join(self.build_directory, 'source', 'static'))
-        self._import_templates(os.path.join(self.build_directory, 'source', 'templates'))
-
-        # CREATE conf.py FILE
+        # default sphinxbuilder options
+        for name, value in [
+                ('project', self.name), ('extensions', ''), ('exclude_trees', ''),
+                ('author', ''), ('copyright', ''), ('version', '1.0'), ('release', '1.0'),
+                ('master', 'index'), ('suffix', '.txt'), ('now', str(datetime.now().ctime())),
+                ('dot', sys.platform=='win32' and '_' or '.'), ('project_doc_texescaped', ''),
+                ('year', str(datetime.now().year)), ('author_texescaped', ''),
+                ('logo', ''), ('latex_options', '')]:
+            if name not in self.options:
+                if name in layout_options:
+                    self.options[name] = layout_options[name]
+                else:
+                    self.options[name] = value
         self.options['project_fn'] = make_filename(self.options['project'])
         self.options['project_doc'] = self.options['project']
         self.options['underline'] = '='*len(self.options['project'])
         self.options['rsrcdir'] = self.source_directory
         self.options['rbuilddir'] = self.build_directory
+
+        # CREATE conf.py FILE
         # crappy, should provide our own template
         # but if sphinx one is changed...
-        logo = os.path.join(
-                self.source_directory,
-                '%sstatic' % self.options['dot'],
-                self.options['logo'])
-        tex = "open('%s').read()" % os.path.join(
-                self.source_directory,
-                '%sstatic' % self.options['dot'],
-                self.options['latex_options'])
-        conf = QUICKSTART_CONF % self.options
-        for source, target in (('#html_logo = None', "html_logo ='%s'" % logo),
-                               ('#latex_logo = None', "latex_logo='%s'" % logo),
-                               ("#latex_preamble = ''", "latex_preamble = %s" % tex)):
-            conf = conf.replace(source, target)
-        self._write_file(os.path.join(self.source_directory, 'conf.py'), conf)
+        source_conf = os.path.join(self.source_directory, 'conf.py')
+        if not os.path.exists(source_conf):
+            conf = QUICKSTART_CONF % self.options
+            if self.options.get('logo', None):
+                logo = os.path.join(self.source_directory,
+                            '%sstatic' % self.options['dot'], self.options['logo'])
+                conf = conf.replace('#html_logo = None', "html_logo='%s'" % logo)
+                conf = conf.replace('#latex_logo = None', "latex_logo='%s'" % logo)
+            if self.options.get('latex_options', None):
+                tex = "open('%s').read()" % os.path.join(
+                                    self.source_directory, '%sstatic' %
+                                    self.options['dot'], self.options['latex_options'])
+                conf = conf.replace("#latex_preamble = ''", "latex_preamble = %s" % tex)
+            self._write_file(os.path.join(self.source_directory, 'conf.py'), conf)
 
         # MAKEFILE
         c = re.compile(r'^SPHINXBUILD .*$', re.M)
@@ -128,11 +106,11 @@ class Recipe(object):
 
 
         # IF THERE IS NO MASTER FILE WE PROVIDE SPHINX DEFAULT ONE
-        if not os.path.exists(os.path.join(self.source_directory,
-                              'index%s' % self.options['suffix'])):
-            self._write_file(os.path.join(self.source_directory,
-                                          'index%s' % self.options['suffix']),
-                             MASTER_FILE % self.options)
+        if not os.path.exists(os.path.join(
+                self.source_directory, 'index%s' % self.options['suffix'])):
+            self._write_file(os.path.join(
+                    self.source_directory, 'index%s' % self.options['suffix']),
+                    MASTER_FILE % self.options)
 
         # SPHINXBUILDER SCRIPT
         script = ['cd %s' % self.build_directory]
@@ -152,11 +130,11 @@ class Recipe(object):
         if product_directories:
             initialization = 'import Products;'
             for product_directory in product_directories:
-                initialization += ('Products.__path__.append(r"%s");' % 
+                initialization += ('Products.__path__.append(r"%s");' %
                                    product_directory)
 
         # SPHINX-BUILD
-        requirements, ws = self.egg.working_set(['Sphinx'])
+        requirements, ws = self.egg.working_set(['Sphinx', 'docutils'])
         extra_paths = self.options.get('extra_paths', None)
         if extra_paths:
             zc.buildout.easy_install.scripts(
@@ -172,50 +150,53 @@ class Recipe(object):
                     self.bin_directory,
                     initialization = initialization)
 
-        return [self.source_directory, sphinxbuilder_script,]
+        return [sphinxbuilder_script,]
     
     update = install
 
-    def _import_conf(self, name):
-        try:
-            mod = __import__(name+'.conf')
-            components = name.split('.')
-            for comp in components[1:]:
-                mod = getattr(mod, comp, None)
-            return getattr(mod, 'conf', None)
-        except:
-            return None
+    def _resolve_path(self, source):
+        source = source.split(':')
+        dist, ws = self.egg.working_set([source[0]])
+        source_directory = ws.by_key[source[0]].location
 
-    def _import_templates(self, path):
-        self._import_folder('templates', path)
+        # check for namespace name (eg: my.package will resolve as my/package)
+        namespace_packages = source[0].split('.')
+        if len(namespace_packages)>=1:
+            source_directory = os.path.join(source_directory, *namespace_packages)
 
-    def _import_static(self, path):
-        self._import_folder('static', path)
+        if len(source)==2:
+            source_directory = os.path.join(source_directory, source[1])
+        return source_directory
 
-    def _import_folder(self, folder, path):
-        target = os.path.join(self.source_directory,
-                              self.options['dot']+folder)
-        if not os.path.exists(target):
-            os.mkdir(target)
-        for root, dirs, files in os.walk(path):
-            for _file in files:
-                shutil.copyfile(os.path.join(root, _file),
-                                os.path.join(target, _file))
+    def resolveEntryPoint(self, source):
+        distributions, ws = self.egg.working_set()
+        
+        # ENTRY POINTS 
+        if ENTRY_POINT not in distributions:
+            distributions.append(ENTRY_POINT)
+        conf_options, entry_points = {}, []
+        for dist in reversed(distributions):
+    
+            # FIND ENTRY POINT
+            entry_point = ws.require(dist)[0].get_entry_map(ENTRY_POINT)
+            if 'default' not in entry_point.keys():
+                continue
+            entry_point = entry_point['default'].load()
+            entry_point_path = os.path.dirname(entry_point.__file__)
+            entry_points.append(entry_point_path)
 
-    def _import_source(self, path, target=None):
-        if target == None:
-            target = self.source_directory
-        if not os.path.exists(target):
-            os.mkdir(target)
-        for root, dirs, files in os.walk(path):
-            for _file in files:
-                if _file.endswith(self.options['suffix']):
-                    shutil.copyfile(os.path.join(root, _file),
-                                    os.path.join(target, _file))
-            for _dir in dirs:
-                if _dir not in ['templates', 'static']:
-                    self._import_source(os.path.join(root, _dir),
-                                        os.path.join(target, _dir))
+            # IMPORT conf.py OPTIONS FROM ENTRY POINT
+            dist_conf = self._import_conf(entry_point.__name__)
+            if dist_conf:
+                for option in ['project', 'extensions', 'exclude_trees',
+                               'author', 'copyright', 'version', 'release',
+                               'master', 'suffix', 'dot', 'now', 'year',
+                           'logo', 'latex_options', 'project_doc_texescaped',
+                           'author_texescaped']:
+                    conf_options[option] = getattr(dist_conf, option,
+                                           conf_options.get(option, ''))
+                    # TODO: extensions is list like option 
+                    # we should append from parent entry points
 
     def _write_file(self, name, content):
         f = open(name, 'w')
