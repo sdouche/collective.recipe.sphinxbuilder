@@ -38,60 +38,6 @@ class Recipe(object):
     def install(self):
         """Installer"""
 
-        # CREATE NEEDED DIRECTORIES
-        if not os.path.exists(self.build_directory):
-            os.mkdir(self.build_directory)
-        if not os.path.isabs(self.source_directory):
-            self.source_directory = self._resolve_path(self.source_directory)
-        if not os.path.exists(self.source_directory):
-            os.mkdir(self.source_directory)
-
-        # default sphinxbuilder options
-        for name, default_value in [
-                    ('project', self.name),
-                    ('extensions', ''),
-                    ('exclude_trees', ''),
-                    ('author', ''),
-                    ('copyright', ''),
-                    ('version', '1.0'),
-                    ('release', '1.0'),
-                    ('master', 'index'),
-                    ('suffix', '.txt'),
-                    ('now', str(datetime.now().ctime())),
-                    ('dot', sys.platform=='win32' and '_' or '.'),
-                    ('project_doc_texescaped', ''),
-                    ('year', str(datetime.now().year)),
-                    ('author_texescaped', ''),
-                    ('logo', ''),
-                    ('latex_options', '')]:
-            value = self._get_option(name)
-            if not value: value = default_value
-            self.options[name] = value
-
-        self.options['project_fn'] = make_filename(self.options['project'])
-        self.options['project_doc'] = self.options['project']
-        self.options['underline'] = '='*len(self.options['project'])
-        self.options['rsrcdir'] = self.source_directory
-        self.options['rbuilddir'] = self.build_directory
-
-        # CREATE conf.py FILE
-        # crappy, should provide our own template
-        # but if sphinx one is changed...
-        source_conf = os.path.join(self.source_directory, 'conf.py')
-        if not os.path.exists(source_conf):
-            conf = QUICKSTART_CONF % self.options
-            if self.options.get('logo', None):
-                logo = os.path.join(self.source_directory,
-                            '%sstatic' % self.options['dot'], self.options['logo'])
-                conf = conf.replace('#html_logo = None', "html_logo='%s'" % logo)
-                conf = conf.replace('#latex_logo = None', "latex_logo='%s'" % logo)
-            if self.options.get('latex_options', None):
-                tex = "open('%s').read()" % os.path.join(
-                                    self.source_directory, '%sstatic' %
-                                    self.options['dot'], self.options['latex_options'])
-                conf = conf.replace("#latex_preamble = ''", "latex_preamble = %s" % tex)
-            self._write_file(os.path.join(self.source_directory, 'conf.py'), conf)
-
         # MAKEFILE
         c = re.compile(r'^SPHINXBUILD .*$', re.M)
         make = c.sub(r'SPHINXBUILD = %s' % (
@@ -164,7 +110,8 @@ class Recipe(object):
         return source_directory
 
     def _get_option(self, name):
-        return None
+        if name in self.options:
+            return self.options[name]
 
     def _write_file(self, name, content):
         f = open(name, 'w')
@@ -173,12 +120,79 @@ class Recipe(object):
         finally:
             f.close()
 
-class LayoutRecipe(Recipe):
+class WriteRecipe(Recipe):
+
+    def install(self):
+        # CREATE NEEDED DIRECTORIES
+        if not os.path.exists(self.build_directory):
+            os.mkdir(self.build_directory)
+        if not os.path.isabs(self.source_directory):
+            self.source_directory = self._resolve_path(self.source_directory)
+        if not os.path.exists(self.source_directory):
+            os.mkdir(self.source_directory)
+            os.mkdir(os.path.join(self.source_directory, self.dot+'static'))
+
+        # default sphinxbuilder options
+        for name, default_value in [
+                    ('project', self.name),
+                    ('extensions', ''),
+                    ('exclude_trees', ''),
+                    ('author', ''),
+                    ('copyright', ''),
+                    ('version', '1.0'),
+                    ('release', '1.0'),
+                    ('master', 'index'),
+                    ('suffix', '.txt'),
+                    ('now', str(datetime.now().ctime())),
+                    ('dot', sys.platform=='win32' and '_' or '.'),
+                    ('project_doc_texescaped', ''),
+                    ('year', str(datetime.now().year)),
+                    ('author_texescaped', ''),
+                    ('logo', ''),
+                    ('latex_options', '')]:
+            value = self._get_option(name)
+            if not value: value = default_value
+            if name == 'extensions': value = str(value.split())[1:-1]
+            self.options[name] = value
+
+        self.options['project_fn'] = make_filename(self.options['project'])
+        self.options['project_doc'] = self.options['project']
+        self.options['underline'] = '='*len(self.options['project'])
+        self.options['rsrcdir'] = self.source_directory
+        self.options['rbuilddir'] = self.build_directory
+
+        # CREATE conf.py FILE
+        # crappy, should provide our own template
+        # but if sphinx one is changed...
+        source_conf = os.path.join(self.source_directory, 'conf.py')
+        if not os.path.exists(source_conf):
+            conf = QUICKSTART_CONF % self.options
+            if self.options.get('logo', None):
+                logo = os.path.join(self.source_directory,
+                            '%sstatic' % self.options['dot'], self.options['logo'])
+                conf = conf.replace('#html_logo = None', "html_logo='%s'" % logo)
+                conf = conf.replace('#latex_logo = None', "latex_logo='%s'" % logo)
+            if self.options.get('latex_options', None):
+                tex = "open('%s').read()" % os.path.join(
+                                    self.source_directory, '%sstatic' %
+                                    self.options['dot'], self.options['latex_options'])
+                conf = conf.replace("#latex_preamble = ''", "latex_preamble = %s" % tex)
+            self._write_file(os.path.join(self.source_directory, 'conf.py'), conf)
+
+        return Recipe.install(self)
+
+
+class LayoutRecipe(WriteRecipe):
     layout_templates = None
     layout_static = None
     
     def install(self):
-        paths = Recipe.install(self)
+        if not os.path.exists(self.build_directory):
+            os.mkdir(self.build_directory)
+        if not os.path.isabs(self.source_directory):
+            self.source_directory = self._resolve_path(self.source_directory)
+        if not os.path.exists(self.source_directory):
+            os.mkdir(self.source_directory)
         
         dst_templates = os.path.join(self.source_directory, self.dot+'templates')
         if self.layout_templates and \
@@ -191,6 +205,9 @@ class LayoutRecipe(Recipe):
                 os.path.exists(self.layout_static) and \
                 not os.path.exists(dst_static):
             shutil.copytree(self.layout_static, dst_static)
+
+        return WriteRecipe.install(self)
+
 
 class PloneRecipe(LayoutRecipe):
     

@@ -72,6 +72,7 @@ setup(name='collective.recipe.sphinxbuilder',
       extras_require=dict(tests=['zope.testing', 'zc.buildout']),
       test_suite = 'collective.recipe.sphinxbuilder.tests.test_docs.test_suite',
       entry_points = {"zc.buildout": ["default = collective.recipe.sphinxbuilder:Recipe",
+                                      "write = collective.recipe.sphinxbuilder:WriteRecipe",
                                       "plone = collective.recipe.sphinxbuilder:PloneRecipe"]}
       )
 
