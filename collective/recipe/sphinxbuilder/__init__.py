@@ -30,7 +30,8 @@ class Recipe(object):
         self.outputs = [o.strip() for o in options.get('outputs', 'html').split() if o.strip()!='']
         self.dot = sys.platform=='win32' and '_' or '.'
 
-        self.build_directory = options.get('build_directory', os.path.join(self.buildout_directory, 'docs'))
+        self.build_directory = options.get('build_directory',
+                                    os.path.join(self.buildout_directory, 'docs'))
         self.source_directory = options.get('source', os.path.join(self.build_directory, 'source'))
         self.latex_directory = os.path.join(self.build_directory, 'latex')
 
@@ -38,41 +39,35 @@ class Recipe(object):
         """Installer"""
 
         # CREATE NEEDED DIRECTORIES
-        layout_options = {}
         if not os.path.exists(self.build_directory):
             os.mkdir(self.build_directory)
         if not os.path.isabs(self.source_directory):
             self.source_directory = self._resolve_path(self.source_directory)
-        else:
-            if not os.path.exists(self.source_directory):
-                os.mkdir(self.source_directory)
-            # LAYOUT (apply starting layout only if we are in "develop" mode)
-            if 'layout' in self.options:
-                self.layout_directory = self._resolve_path(self.options['layout'])
-                for item in ['static', 'templates']:
-                    src_path = os.path.join(self.layout_directory, item)
-                    dst_path = os.path.join(self.source_directory, self.dot+item)
-                    if os.path.exists(src_path) and not os.path.exists(dst_path):
-                        shutil.copytree(src_path, dst_path)
-                eval(compile(open(os.path.join(self.layout_directory, 'conf.py')).read(),
-                        '', 'exec'), globals(), layout_options)
-            for item in ['static', 'templates']:
-                path = os.path.join(self.source_directory, self.dot+item)
-                if not os.path.exists(path): os.mkdir(path)
+        if not os.path.exists(self.source_directory):
+            os.mkdir(self.source_directory)
 
         # default sphinxbuilder options
-        for name, value in [
-                ('project', self.name), ('extensions', ''), ('exclude_trees', ''),
-                ('author', ''), ('copyright', ''), ('version', '1.0'), ('release', '1.0'),
-                ('master', 'index'), ('suffix', '.txt'), ('now', str(datetime.now().ctime())),
-                ('dot', sys.platform=='win32' and '_' or '.'), ('project_doc_texescaped', ''),
-                ('year', str(datetime.now().year)), ('author_texescaped', ''),
-                ('logo', ''), ('latex_options', '')]:
-            if name not in self.options:
-                if name in layout_options:
-                    self.options[name] = layout_options[name]
-                else:
-                    self.options[name] = value
+        for name, default_value in [
+                    ('project', self.name),
+                    ('extensions', ''),
+                    ('exclude_trees', ''),
+                    ('author', ''),
+                    ('copyright', ''),
+                    ('version', '1.0'),
+                    ('release', '1.0'),
+                    ('master', 'index'),
+                    ('suffix', '.txt'),
+                    ('now', str(datetime.now().ctime())),
+                    ('dot', sys.platform=='win32' and '_' or '.'),
+                    ('project_doc_texescaped', ''),
+                    ('year', str(datetime.now().year)),
+                    ('author_texescaped', ''),
+                    ('logo', ''),
+                    ('latex_options', '')]:
+            value = self._get_option(name)
+            if not value: value = default_value
+            self.options[name] = value
+
         self.options['project_fn'] = make_filename(self.options['project'])
         self.options['project_doc'] = self.options['project']
         self.options['underline'] = '='*len(self.options['project'])
@@ -168,35 +163,8 @@ class Recipe(object):
             source_directory = os.path.join(source_directory, source[1])
         return source_directory
 
-    def resolveEntryPoint(self, source):
-        distributions, ws = self.egg.working_set()
-        
-        # ENTRY POINTS 
-        if ENTRY_POINT not in distributions:
-            distributions.append(ENTRY_POINT)
-        conf_options, entry_points = {}, []
-        for dist in reversed(distributions):
-    
-            # FIND ENTRY POINT
-            entry_point = ws.require(dist)[0].get_entry_map(ENTRY_POINT)
-            if 'default' not in entry_point.keys():
-                continue
-            entry_point = entry_point['default'].load()
-            entry_point_path = os.path.dirname(entry_point.__file__)
-            entry_points.append(entry_point_path)
-
-            # IMPORT conf.py OPTIONS FROM ENTRY POINT
-            dist_conf = self._import_conf(entry_point.__name__)
-            if dist_conf:
-                for option in ['project', 'extensions', 'exclude_trees',
-                               'author', 'copyright', 'version', 'release',
-                               'master', 'suffix', 'dot', 'now', 'year',
-                           'logo', 'latex_options', 'project_doc_texescaped',
-                           'author_texescaped']:
-                    conf_options[option] = getattr(dist_conf, option,
-                                           conf_options.get(option, ''))
-                    # TODO: extensions is list like option 
-                    # we should append from parent entry points
+    def _get_option(self, name):
+        return None
 
     def _write_file(self, name, content):
         f = open(name, 'w')
@@ -204,4 +172,40 @@ class Recipe(object):
             f.write(content)
         finally:
             f.close()
+
+class LayoutRecipe(Recipe):
+    layout_templates = None
+    layout_static = None
+    
+    def install(self):
+        paths = Recipe.install(self)
+        
+        dst_templates = os.path.join(self.source_directory, self.dot+'templates')
+        if self.layout_templates and \
+                os.path.exists(self.layout_templates) and \
+                not os.path.exists(dst_templates):
+            shutil.copytree(self.layout_templates, dst_templates)
+
+        dst_static = os.path.join(self.source_directory, self.dot+'static')
+        if self.layout_static and \
+                os.path.exists(self.layout_static) and \
+                not os.path.exists(dst_static):
+            shutil.copytree(self.layout_static, dst_static)
+
+class PloneRecipe(LayoutRecipe):
+    
+    layout_templates = os.path.join(os.path.dirname(__file__), 'plone', 'templates')
+    layout_static = os.path.join(os.path.dirname(__file__), 'plone', 'static')
+
+    def _get_option(self, name):
+        default_options = dict(
+            project         = 'Plone',
+            author          = 'Plone Community',
+            copyright       = str(datetime.now().year)+', Plone Community',
+            logo            = 'logo.png',
+            latex_options   = 'options.tex')
+        if name in default_options and name not in self.options:
+            return default_options[name]
+
+
 

@@ -37,10 +37,8 @@ long_description = (
     '********\n'
     )
 
-entry_point = 'collective.recipe.sphinxbuilder:Recipe'
-entry_points = {"zc.buildout": ["default = %s" % entry_point],}
 
-tests_require=['zope.testing', 'zc.buildout']
+
 
 setup(name='collective.recipe.sphinxbuilder',
       version=version,
@@ -70,9 +68,10 @@ setup(name='collective.recipe.sphinxbuilder',
                         'docutils',
                         'Sphinx==0.5.1'
                         ],
-      tests_require=tests_require,
-      extras_require=dict(tests=tests_require),
+      tests_require=['zope.testing', 'zc.buildout'],
+      extras_require=dict(tests=['zope.testing', 'zc.buildout']),
       test_suite = 'collective.recipe.sphinxbuilder.tests.test_docs.test_suite',
-      entry_points=entry_points,
+      entry_points = {"zc.buildout": ["default = collective.recipe.sphinxbuilder:Recipe",
+                                      "plone = collective.recipe.sphinxbuilder:PloneRecipe"]}
       )
 
