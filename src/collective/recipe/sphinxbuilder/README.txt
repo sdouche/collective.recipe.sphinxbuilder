@@ -28,7 +28,7 @@ a section like this::
         ...
     
     [sphinxbuilder]
-    recipe = collective.recipe.sphinxbuilder
+    recipe = collective.recipe.sphinxbuilder:write
 
 
 That's it ! Run your buildout and you will get:
@@ -46,33 +46,6 @@ Everytime source is modified, run the buildout and script again.
 
 A good starting point to write your documentation is: 
 http://sphinx.pocoo.org/contents.html.
-
-Providing documentation from packages
-=====================================
-
-You can also include documentation from packages by providing entry_point.
-Entry points will be picked by order you provide in eggs buildout option.::
-
-    setup(
-        ...
-        entry_points = dict('collective.recipe.sphinxbuilder':
-                                'default: custom.package.docs')
-        ...
-        )
-
-With this entry point declaration above we declared that there is a 'docs'
-module in 'custom.package' which can contain:
-
- - conf.py
-   Default values for sphinx. You can still override them with
-   buildout configuration.
- - static directory
-   Override default static file/s.
- - template directory
-   Override default template file/s.
- - source files
-   Root of our entry point module will be searched for any source files,
-   depending on what suffix you choose.
 
 Supported options
 =================
@@ -148,7 +121,10 @@ buildout that uses the recipe::
     ... parts = sphinxbuilder
     ...
     ... [sphinxbuilder]
-    ... recipe = collective.recipe.sphinxbuilder
+    ... recipe = collective.recipe.sphinxbuilder:write
+    ... project = SphinxBuilder
+    ... version = 0.5.1
+    ... release = 0.5.1
     ... """) 
 
 Let's run the buildout::

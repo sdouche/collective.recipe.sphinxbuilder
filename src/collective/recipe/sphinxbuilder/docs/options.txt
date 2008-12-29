@@ -1,0 +1,76 @@
+.. index:: options
+
+=================
+Supported options
+=================
+
+The recipe supports the following options:
+
+.. glossary::
+
+    build-root
+        Specify the build documentation root. Default to `docs`.
+
+    source
+        source of
+
+    outputs
+        Multiple-line value that defines what kind of output to produce. 
+        Can be `html`, `latex` or `pdf`. Defaults to `html`.
+        
+    script-name
+        The name of the script generated. Defaults to the name of the section.    
+        
+    extra-paths
+        Extra paths to be inserted into sys.path.
+
+    products
+        Extra product directories to be extend the Products namespace for
+        old-style Zope Products.
+
+
+Default layout options
+======================
+    
+.. glossary::
+
+    project
+        The name of the project used in Plone. Defaults to Plone.
+
+    extensions
+        Sphinx extensions in use. Defaults to none. 
+
+    master 
+        Name of the index file. Defaults to `index`.
+
+    year
+        Year of the project. Defaults to current year.
+
+    suffix
+        File extensions used for reST file. Defaults to .txt
+
+    author
+        Author. Defaults to Plone Community. 
+
+    version
+        Version. Defaults to 1.0.
+
+    release
+        Release. Defaults to 1.0.
+
+    dot 
+        The prefix of the static and template directory.
+        Defaults to '.' under Linux and '_' under Windows.
+
+    logo 
+        Logo used for html and pdf. Defaults to plone.png 
+        (which is provided by the recipe)
+
+    css
+        css file used to change Sphinx look. Defaults to 
+        plone.css (which is provided by the recipe)
+
+    latex_options
+        extra latex options file used in Sphinx. Defaults to options.tex
+        provided by the recipe. 
+

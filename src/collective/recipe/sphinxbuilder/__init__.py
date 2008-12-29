@@ -38,6 +38,11 @@ class Recipe(object):
     def install(self):
         """Installer"""
 
+        if not os.path.exists(self.build_directory):
+            os.mkdir(self.build_directory)
+        if not os.path.isabs(self.source_directory):
+            self.source_directory = self._resolve_path(self.source_directory)
+
         # MAKEFILE
         c = re.compile(r'^SPHINXBUILD .*$', re.M)
         make = c.sub(r'SPHINXBUILD = %s' % (
@@ -75,7 +80,14 @@ class Recipe(object):
                                    product_directory)
 
         # SPHINX-BUILD
-        requirements, ws = self.egg.working_set(['Sphinx', 'docutils'])
+        
+        # WEIRD: this is needed for doctest to pass
+        # :write gives error 
+        #       -> ValueError: ('Expected version spec in', 
+        #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
+        self.egg.name = 'collective.recipe.sphinxbuilder' 
+
+        requirements, ws = self.egg.working_set(['collective.recipe.sphinxbuilder'])
         extra_paths = self.options.get('extra_paths', None)
         if extra_paths:
             zc.buildout.easy_install.scripts(
@@ -123,6 +135,7 @@ class Recipe(object):
 class WriteRecipe(Recipe):
 
     def install(self):
+
         # CREATE NEEDED DIRECTORIES
         if not os.path.exists(self.build_directory):
             os.mkdir(self.build_directory)

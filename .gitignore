@@ -8,8 +8,7 @@ build
 bin
 develop-eggs
 dist
-docs
+docs/
 lib
 parts
-src
 var

@@ -16,7 +16,7 @@ long_description = (
     'Detailed Documentation\n'
     '**********************\n'
     + '\n' +
-    read('collective', 'recipe', 'sphinxbuilder', 'README.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'README.txt')
     + '\n' +
     'Todo list\n' 
     '*********\n'
@@ -57,7 +57,8 @@ setup(name='collective.recipe.sphinxbuilder',
       author_email='tarek@ziade.org',
       url='http://svn.plone.org/svn/collective/buildout/collective.recipe.sphinxbuilder/trunk',
       license='ZPL',
-      packages=find_packages(exclude=['ez_setup']),
+      packages = find_packages('src', exclude=['ez_setup']),
+      package_dir = {'':'src'},
       namespace_packages=['collective', 'collective.recipe'],
       include_package_data=True,
       zip_safe=False,

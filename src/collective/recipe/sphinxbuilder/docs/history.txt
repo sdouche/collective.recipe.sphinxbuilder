@@ -1,0 +1,43 @@
+=======
+Changes
+=======
+
+trunk (unreleased)
+==================
+
+  - fix issue, override source files in the templates directory
+    using _import_templates [mr_savage]
+
+0.5.0 (2008-12-06)
+==================
+
+ - Making it compatible with latest sphinx 0.5 [Rok Garbas]
+ - Allow for specifying 'product_directories' in order to be able to
+   document old-style Zope Products. [Sidnei]
+
+0.2.1 (2008-11-18)
+==================
+
+ - Manifest file fixed and making fix release [Rok Garbas]
+
+0.2.0 (2008-11-11)
+==================
+
+ - source tree generated every time under
+   parts/<buildout-section-name> [Rok Garbas]
+ - finds conf options, source, static and template files using
+   entry_point 'collective.recipe.sphinxbuilder' [Rok Garbas]
+ - custom source folder at docs/source [Rok Garbas]
+ - build section moved to docs/html, docs/latex [Rok Garbas]
+
+0.1.1 (2008-09-11)
+==================
+
+ - Using a sphinx-build local to the environment [Tarek]
+
+0.1.0 (2008-09-10)
+==================
+
+ - Initial implementation [Tarek Ziade]
+ - Created recipe with ZopeSkel [Tarek Ziade].
+

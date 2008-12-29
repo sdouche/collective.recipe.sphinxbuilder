@@ -1,0 +1,32 @@
+===========
+Quick start
+===========
+
+To use the recipe, add in your buildout configuration file
+a section like this::
+
+    [buildout]
+    parts =
+        ...
+        sphinxbuilder
+        ...
+    
+    [sphinxbuilder]
+    recipe = collective.recipe.sphinxbuilder:write
+
+
+That's it ! Run your buildout and you will get:
+
+- a new script in the `bin` folder, called  `sphinxbuilder`
+- a `parts/sphinxbuilder` directory containing your documentation.
+
+To build your documentation, just run the sphinx script::
+
+    $ bin/sphinxbuilder
+
+You will get a shiny Sphinx documenation in `docs/html`.
+To write your documentation, go in `docs/source`, if there is none create it.
+Everytime source is modified, run the buildout and script again.
+
+A good starting point to write your documentation is: 
+http://sphinx.pocoo.org/contents.html.

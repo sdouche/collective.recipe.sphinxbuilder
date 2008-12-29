@@ -1,0 +1,30 @@
+.. SphinxBuilder documentation master file, created by sphinx-quickstart on Sun Dec 28 12:44:10 2008.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+.. contents::
+
+=========================================
+Welcome to SphinxBuilder's documentation!
+=========================================
+
+:Date: |today|
+:Version: |version|
+:Release: |release|
+
+zc.buildout recipe to generate and build Sphinx-based documentation in the buildout.
+
+:Code repository: https://svn.plone.org/svn/collective/buildout/collective.recipe.sphinxbuilder/
+:Questions and comments: tarek_at_ziade.org
+
+.. include:: about_sphinx.txt
+.. include:: quick_start.txt
+.. include:: options.txt
+.. include:: usage.txt
+.. include:: generate-this-doc.txt
+.. include:: reference.txt
+.. include:: history.txt
+.. include:: contributors.txt
+
+
+

@@ -1,0 +1,133 @@
+=============
+Example usage
+=============
+
+The recipe can be used without any options. We'll start by creating a 
+buildout that uses the recipe::
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = sphinxbuilder
+    ...
+    ... [sphinxbuilder]
+    ... recipe = collective.recipe.sphinxbuilder:write
+    ... project = SphinxBuilder
+    ... version = 0.5.1
+    ... release = 0.5.1
+    ... """) 
+
+Let's run the buildout::
+
+    >>> print 'start', system(buildout) 
+    start...
+    Installing sphinxbuilder.
+    Generated script '/sample-buildout/bin/sphinx-build'.
+    <BLANKLINE>
+
+What are we expecting ? 
+
+A `docs` folder with a Sphinx structure::
+
+    >>> docs = join(sample_buildout, 'docs')
+    >>> ls(docs)
+    - Makefile
+
+    >>> source = join(sample_buildout, 'parts', 'sphinxbuilder')
+    >>> ls(source) 
+    d  .static
+    d  .templates
+    -  conf.py
+    -  index.txt
+
+    >>> ls(join(source, '.templates'))
+    -  layout.html
+    -  modindex.html
+    -  search.html
+
+    >>> ls(join(source, '.static'))
+    -  options.tex
+    -  plone.css
+    -  plone_logo.png
+
+A script in the `bin` folder to build the docs::
+
+    >>> bin = join(sample_buildout, 'bin')
+    >>> ls(bin)
+    - buildout
+    - sphinx-build
+    - sphinxbuilder
+
+The content of the script is a simple shell script::
+
+    >>> script = join(sample_buildout, 'bin', 'sphinxbuilder')
+    >>> print open(script).read()
+    cd ...docs
+    make html
+    
+    >>> print 'start', system(script)
+    start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
+    ...
+   
+If we want `latex` and `pdf`, we need to explicitly define it::
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = sphinxbuilder
+    ...
+    ... [sphinxbuilder]
+    ... recipe = collective.recipe.sphinxbuilder
+    ... outputs =
+    ...     html
+    ...     latex
+    ...     pdf
+    ... """) 
+    >>> print 'start', system(buildout)
+    start Uninstalling sphinxbuilder.
+    Installing sphinxbuilder.
+    <BLANKLINE>
+
+Let's see our script now::
+    
+    >>> cat(script)
+    cd ...docs
+    make html
+    make latex
+    make latex && cd ... && make
+
+Finally let's run it::
+
+    >>> print 'start', system(script)
+    start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
+    ...
+    Transcript written in modPlone.ilg.
+    <BLANKLINE>
+
+We should have some nice reST file::
+
+    >>> print open(join(sample_buildout, 'parts', 'sphinxbuilder', 'index.txt')).read()
+    .. Plone documentation master file, ...
+    <BLANKLINE>
+    Welcome to Plone's documentation!
+    =================================
+    <BLANKLINE>
+    Contents:
+    <BLANKLINE>
+    .. toctree::
+       :maxdepth: 2
+    <BLANKLINE>
+    Indices and tables
+    ==================
+    <BLANKLINE>
+    * :ref:`genindex`
+    * :ref:`modindex`
+    * :ref:`search`
+    <BLANKLINE>
+    <BLANKLINE>
+
+And the html rendering should use the plone logo::
+
+    >>> html = open(join(docs, 'html', 'index.html')).read()
+    >>> 'plone_logo.png' in html
+    True
