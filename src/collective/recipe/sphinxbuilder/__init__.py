@@ -45,6 +45,8 @@ class Recipe(object):
 
         self.options['rsrcdir'] = self.source_directory
         self.options['rbuilddir'] = self.build_directory
+        if 'dot' not in self.options:
+            self.options['dot'] = self.dot
         if 'suffix' not in self.options:
             self.options['suffix'] = '.txt'
 
