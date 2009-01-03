@@ -1,4 +1,4 @@
 include *.txt
-recursive-include collective *
+recursive-include src/collective *
 global-exclude *pyc
 

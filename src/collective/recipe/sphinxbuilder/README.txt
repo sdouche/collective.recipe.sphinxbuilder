@@ -142,23 +142,13 @@ A `docs` folder with a Sphinx structure::
     >>> docs = join(sample_buildout, 'docs')
     >>> ls(docs)
     - Makefile
+    d  source
 
-    >>> source = join(sample_buildout, 'parts', 'sphinxbuilder')
+    >>> source = join(sample_buildout, 'docs', 'source')
     >>> ls(source) 
     d  .static
-    d  .templates
     -  conf.py
     -  index.txt
-
-    >>> ls(join(source, '.templates'))
-    -  layout.html
-    -  modindex.html
-    -  search.html
-
-    >>> ls(join(source, '.static'))
-    -  options.tex
-    -  plone.css
-    -  plone_logo.png
 
 A script in the `bin` folder to build the docs::
 
@@ -188,10 +178,7 @@ If we want `latex` and `pdf`, we need to explicitly define it::
     ...
     ... [sphinxbuilder]
     ... recipe = collective.recipe.sphinxbuilder
-    ... outputs =
-    ...     html
-    ...     latex
-    ...     pdf
+    ... outputs = html latex pdf
     ... """) 
     >>> print 'start', system(buildout)
     start Uninstalling sphinxbuilder.
@@ -211,16 +198,16 @@ Finally let's run it::
     >>> print 'start', system(script)
     start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
     ...
-    Transcript written in modPlone.ilg.
+    Transcript written in modSphinxBuilder.ilg.
     <BLANKLINE>
 
 We should have some nice reST file::
 
-    >>> print open(join(sample_buildout, 'parts', 'sphinxbuilder', 'index.txt')).read()
-    .. Plone documentation master file, ...
+    >>> print open(join(source, 'index.txt')).read()
+    .. SphinxBuilder documentation master file, ...
     <BLANKLINE>
-    Welcome to Plone's documentation!
-    =================================
+    Welcome to SphinxBuilder's documentation!
+    =========================================
     <BLANKLINE>
     Contents:
     <BLANKLINE>
@@ -235,11 +222,4 @@ We should have some nice reST file::
     * :ref:`search`
     <BLANKLINE>
     <BLANKLINE>
-
-And the html rendering should use the plone logo::
-
-    >>> html = open(join(docs, 'html', 'index.html')).read()
-    >>> 'plone_logo.png' in html
-    True
-
 

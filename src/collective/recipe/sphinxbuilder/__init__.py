@@ -43,13 +43,17 @@ class Recipe(object):
         if not os.path.isabs(self.source_directory):
             self.source_directory = self._resolve_path(self.source_directory)
 
+        self.options['rsrcdir'] = self.source_directory
+        self.options['rbuilddir'] = self.build_directory
+        if 'suffix' not in self.options:
+            self.options['suffix'] = '.txt'
+
         # MAKEFILE
         c = re.compile(r'^SPHINXBUILD .*$', re.M)
         make = c.sub(r'SPHINXBUILD = %s' % (
                os.path.join(self.bin_directory, 'sphinx-build')),
                MAKEFILE % self.options)
         self._write_file(os.path.join(self.build_directory, 'Makefile'), make)
-
 
         # IF THERE IS NO MASTER FILE WE PROVIDE SPHINX DEFAULT ONE
         if not os.path.exists(os.path.join(
@@ -144,7 +148,7 @@ class WriteRecipe(Recipe):
         if not os.path.exists(self.source_directory):
             os.mkdir(self.source_directory)
             os.mkdir(os.path.join(self.source_directory, self.dot+'static'))
-
+        
         # default sphinxbuilder options
         for name, default_value in [
                     ('project', self.name),
@@ -171,8 +175,6 @@ class WriteRecipe(Recipe):
         self.options['project_fn'] = make_filename(self.options['project'])
         self.options['project_doc'] = self.options['project']
         self.options['underline'] = '='*len(self.options['project'])
-        self.options['rsrcdir'] = self.source_directory
-        self.options['rbuilddir'] = self.build_directory
 
         # CREATE conf.py FILE
         # crappy, should provide our own template
