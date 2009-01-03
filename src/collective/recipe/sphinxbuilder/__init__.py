@@ -30,8 +30,7 @@ class Recipe(object):
         self.outputs = [o.strip() for o in options.get('outputs', 'html').split() if o.strip()!='']
         self.dot = sys.platform=='win32' and '_' or '.'
 
-        self.build_directory = options.get('build_directory',
-                                    os.path.join(self.buildout_directory, 'docs'))
+        self.build_directory = os.path.join(self.buildout_directory, options.get('build_directory', 'docs'))
         self.source_directory = options.get('source', os.path.join(self.build_directory, 'source'))
         self.latex_directory = os.path.join(self.build_directory, 'latex')
 
