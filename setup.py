@@ -67,7 +67,7 @@ setup(name='collective.recipe.sphinxbuilder',
                         'zc.buildout',
                         'zc.recipe.egg',
                         'docutils',
-                        'Sphinx==0.5.1'
+                        'Sphinx>=0.5.1'
                         ],
       tests_require=['zope.testing', 'zc.buildout'],
       extras_require=dict(tests=['zope.testing', 'zc.buildout']),
