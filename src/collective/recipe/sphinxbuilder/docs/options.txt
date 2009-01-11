@@ -8,11 +8,12 @@ The recipe supports the following options:
 
 .. glossary::
 
-    build-root
+    build_directroy
         Specify the build documentation root. Default to `docs`.
 
-    source
-        source of
+    source_directory
+        Speficy the source directory of documentation. Defaults to
+				`{build_directory}/source`.
 
     outputs
         Multiple-line value that defines what kind of output to produce. 

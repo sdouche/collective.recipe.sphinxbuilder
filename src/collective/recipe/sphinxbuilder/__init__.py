@@ -31,7 +31,7 @@ class Recipe(object):
         self.dot = sys.platform=='win32' and '_' or '.'
 
         self.build_directory = os.path.join(self.buildout_directory, options.get('build_directory', 'docs'))
-        self.source_directory = options.get('source', os.path.join(self.build_directory, 'source'))
+        self.source_directory = options.get('source_directory', os.path.join(self.build_directory, 'source'))
         self.latex_directory = os.path.join(self.build_directory, 'latex')
 
     def install(self):
