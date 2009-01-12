@@ -74,4 +74,3 @@ Default layout options
     latex_options
         extra latex options file used in Sphinx. Defaults to options.tex
         provided by the recipe. 
-

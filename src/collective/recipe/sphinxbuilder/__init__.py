@@ -27,7 +27,7 @@ class Recipe(object):
 
         self.script_name = options.get('script-name', name)
         self.product_directories = options.get('product_directories', '')
-        self.outputs = [o.strip() for o in options.get('outputs', 'html').split() if o.strip()!='']
+        self.outputs = [o for o in options.get('outputs', 'html').split()]
         self.dot = sys.platform=='win32' and '_' or '.'
 
         self.build_directory = os.path.join(self.buildout_directory, options.get('build_directory', 'docs'))
@@ -57,11 +57,10 @@ class Recipe(object):
         self._write_file(os.path.join(self.build_directory, 'Makefile'), make)
 
         # IF THERE IS NO MASTER FILE WE PROVIDE SPHINX DEFAULT ONE
-        if not os.path.exists(os.path.join(
-                self.source_directory, 'index%s' % self.options['suffix'])):
-            self._write_file(os.path.join(
-                    self.source_directory, 'index%s' % self.options['suffix']),
-                    MASTER_FILE % self.options)
+        if not os.path.exists(os.path.join(self.source_directory,
+            'index%s' % self.options['suffix'])):
+            self._write_file(os.path.join( self.source_directory,
+                'index%s' % self.options['suffix']), MASTER_FILE % self.options)
 
         # SPHINXBUILDER SCRIPT
         script = ['cd %s' % self.build_directory]
@@ -77,7 +76,7 @@ class Recipe(object):
 
         # Setup extra Products namespace for old-style Zope products.
         initialization = ''
-        product_directories = [d.strip() for d in self.product_directories.split()]
+        product_directories = [d for d in self.product_directories.split()]
         if product_directories:
             initialization = 'import Products;'
             for product_directory in product_directories:
@@ -85,31 +84,28 @@ class Recipe(object):
                                    product_directory)
 
         # SPHINX-BUILD
-        
         # WEIRD: this is needed for doctest to pass
         # :write gives error 
         #       -> ValueError: ('Expected version spec in', 
         #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
-        self.egg.name = 'collective.recipe.sphinxbuilder' 
+        self.egg.name = 'collective.recipe.sphinxbuilder'
 
         requirements, ws = self.egg.working_set(['collective.recipe.sphinxbuilder'])
         extra_paths = self.options.get('extra_paths', None)
+        egg_options = {}
+
         if extra_paths:
-            zc.buildout.easy_install.scripts(
-                    [('sphinx-build', 'sphinx', 'main')], ws,
-                    self.buildout[self.buildout['buildout']['python']]['executable'],
-                    self.bin_directory,
-                    extra_paths = extra_paths.split(),
-                    initialization = initialization)
-        else:
-            zc.buildout.easy_install.scripts(
-                    [('sphinx-build', 'sphinx', 'main')], ws,
-                    self.buildout[self.buildout['buildout']['python']]['executable'],
-                    self.bin_directory,
-                    initialization = initialization)
+            egg_options['extra_paths'] = extra_paths.split()
+
+        zc.buildout.easy_install.scripts(
+                [('sphinx-build', 'sphinx', 'main')], ws,
+                self.buildout[self.buildout['buildout']['python']]['executable'],
+                self.bin_directory,
+                initialization = initialization,
+                **egg_options)
 
         return [sphinxbuilder_script,]
-    
+
     update = install
 
     def _resolve_path(self, source):
@@ -149,7 +145,7 @@ class WriteRecipe(Recipe):
         if not os.path.exists(self.source_directory):
             os.mkdir(self.source_directory)
             os.mkdir(os.path.join(self.source_directory, self.dot+'static'))
-        
+
         # default sphinxbuilder options
         for name, default_value in [
                     ('project', self.name),
@@ -226,7 +222,7 @@ class LayoutRecipe(WriteRecipe):
 
 
 class PloneRecipe(LayoutRecipe):
-    
+
     layout_templates = os.path.join(os.path.dirname(__file__), 'plone', 'templates')
     layout_static = os.path.join(os.path.dirname(__file__), 'plone', 'static')
 
@@ -239,6 +235,3 @@ class PloneRecipe(LayoutRecipe):
             latex_options   = 'options.tex')
         if name in default_options and name not in self.options:
             return default_options[name]
-
-
-
