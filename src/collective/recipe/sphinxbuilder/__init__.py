@@ -29,12 +29,14 @@ class Recipe(object):
         self.parts_directory = self.buildout['buildout']['parts-directory']
 
         self.script_name = options.get('script-name', name)
-        self.product_directories = options.get('product_directories', '')
+        self.interpreter = self.options.get('interpreter')
+        self.product_directories = options.get('products', '')
         self.outputs = [o for o in options.get('outputs', 'html').split()]
         self.dot = sys.platform=='win32' and '_' or '.'
+        self.sphinx_options = self.options.get('sphinx-options')
 
-        self.build_directory = os.path.join(self.buildout_directory, options.get('build_directory', 'docs'))
-        self.source_directory = options.get('source_directory', os.path.join(self.build_directory, 'source'))
+        self.build_directory = os.path.join(self.buildout_directory, options.get('docs-directory', 'docs'))
+        self.source_directory = options.get('source-directory', os.path.join(self.build_directory, 'source'))
         self.latex_directory = os.path.join(self.build_directory, 'latex')
 
     def install(self):
@@ -55,11 +57,23 @@ class Recipe(object):
 
         # MAKEFILE
         log.info('writing MAKEFILE..')
-        c = re.compile(r'^SPHINXBUILD .*$', re.M)
-        make = c.sub(r'SPHINXBUILD = %s' % (
-               os.path.join(self.bin_directory, 'sphinx-build')),
-               MAKEFILE % self.options)
+        sphinx_build = re.compile(r'^SPHINXBUILD .*$', re.M)
+        sphinx_opts = re.compile(r'^SPHINXOPTS .*$', re.M)
+        build_command = os.path.join(self.bin_directory, 'sphinx-build')
+
+        if self.interpreter:
+            build_command = ' '.join([self.interpreter, build_command])
+
+        make = sphinx_build.sub(r'SPHINXBUILD = %s' % (build_command),
+            MAKEFILE % self.options)
+
+        if self.sphinx_options:
+            log.info('writing sphinx-options to MAKEFILE..')
+            make = sphinx_opts.sub(r'SPHINXOPTS    = %s' % (
+                   self.sphinx_options), make)
+
         self._write_file(os.path.join(self.build_directory, 'Makefile'), make)
+
 
         # IF THERE IS NO MASTER FILE WE PROVIDE SPHINX DEFAULT ONE
         if not os.path.exists(os.path.join(self.source_directory,
@@ -82,10 +96,8 @@ class Recipe(object):
         os.chmod(sphinxbuilder_script, 0777)
 
         # Setup extra Products namespace for old-style Zope products.
-        initialization = ''
         product_directories = [d for d in self.product_directories.split()]
         if product_directories:
-            log.info('inserting Products directories..')
             initialization = 'import Products;'
             for product_directory in product_directories:
                 initialization += ('Products.__path__.append(r"%s");' %
@@ -105,12 +117,14 @@ class Recipe(object):
         if extra_paths:
             log.info('inserting extra_paths..')
             egg_options['extra_paths'] = extra_paths.split()
+        if product_directories:
+            log.info('inserting Products directories..')
+            egg_options['initialization'] = initialization
 
         zc.buildout.easy_install.scripts(
                 [('sphinx-build', 'sphinx', 'main')], ws,
                 self.buildout[self.buildout['buildout']['python']]['executable'],
                 self.bin_directory,
-                initialization = initialization,
                 **egg_options)
 
         return [sphinxbuilder_script,]
