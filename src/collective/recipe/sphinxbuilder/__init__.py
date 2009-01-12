@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Recipe sphinxbuilder"""
 
+import logging
 import os
 import re
 import sys
@@ -14,6 +15,8 @@ from sphinx.quickstart import MAKEFILE
 from sphinx.quickstart import MASTER_FILE
 from sphinx.util import make_filename
 
+
+log = logging.getLogger(__name__)
 
 class Recipe(object):
     """zc.buildout recipe"""
@@ -37,6 +40,7 @@ class Recipe(object):
     def install(self):
         """Installer"""
 
+
         if not os.path.exists(self.build_directory):
             os.mkdir(self.build_directory)
         if not os.path.isabs(self.source_directory):
@@ -50,6 +54,7 @@ class Recipe(object):
             self.options['suffix'] = '.txt'
 
         # MAKEFILE
+        log.info('writing MAKEFILE..')
         c = re.compile(r'^SPHINXBUILD .*$', re.M)
         make = c.sub(r'SPHINXBUILD = %s' % (
                os.path.join(self.bin_directory, 'sphinx-build')),
@@ -61,8 +66,10 @@ class Recipe(object):
             'index%s' % self.options['suffix'])):
             self._write_file(os.path.join( self.source_directory,
                 'index%s' % self.options['suffix']), MASTER_FILE % self.options)
+            log.info('writing master file..')
 
         # SPHINXBUILDER SCRIPT
+        log.info('writing sphinxbuilder script..')
         script = ['cd %s' % self.build_directory]
         if 'html' in self.outputs:
             script.append('make html')
@@ -78,6 +85,7 @@ class Recipe(object):
         initialization = ''
         product_directories = [d for d in self.product_directories.split()]
         if product_directories:
+            log.info('inserting Products directories..')
             initialization = 'import Products;'
             for product_directory in product_directories:
                 initialization += ('Products.__path__.append(r"%s");' %
@@ -95,6 +103,7 @@ class Recipe(object):
         egg_options = {}
 
         if extra_paths:
+            log.info('inserting extra_paths..')
             egg_options['extra_paths'] = extra_paths.split()
 
         zc.buildout.easy_install.scripts(
@@ -175,9 +184,10 @@ class WriteRecipe(Recipe):
 
         # CREATE conf.py FILE
         # crappy, should provide our own template
-        # but if sphinx one is changed...
+        # (if sphinx one may change)
         source_conf = os.path.join(self.source_directory, 'conf.py')
         if not os.path.exists(source_conf):
+            log.info('creating conf.py file..')
             conf = QUICKSTART_CONF % self.options
             if self.options.get('logo', None):
                 logo = os.path.join(self.source_directory,
@@ -190,6 +200,8 @@ class WriteRecipe(Recipe):
                                     self.options['dot'], self.options['latex_options'])
                 conf = conf.replace("#latex_preamble = ''", "latex_preamble = %s" % tex)
             self._write_file(os.path.join(self.source_directory, 'conf.py'), conf)
+        else:
+            log.info('conf.py file already exists, skipping..')
 
         return Recipe.install(self)
 
@@ -197,7 +209,7 @@ class WriteRecipe(Recipe):
 class LayoutRecipe(WriteRecipe):
     layout_templates = None
     layout_static = None
-    
+
     def install(self):
         if not os.path.exists(self.build_directory):
             os.mkdir(self.build_directory)
@@ -205,7 +217,7 @@ class LayoutRecipe(WriteRecipe):
             self.source_directory = self._resolve_path(self.source_directory)
         if not os.path.exists(self.source_directory):
             os.mkdir(self.source_directory)
-        
+
         dst_templates = os.path.join(self.source_directory, self.dot+'templates')
         if self.layout_templates and \
                 os.path.exists(self.layout_templates) and \

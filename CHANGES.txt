@@ -1,6 +1,7 @@
 trunk (unreleased)
 ==================
 
+	- added logging [iElectric]
   - fix issue, override source files in the templates directory
     using _import_templates [mr_savage]
 

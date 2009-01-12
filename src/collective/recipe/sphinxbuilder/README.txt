@@ -132,6 +132,10 @@ Let's run the buildout::
     >>> print 'start', system(buildout) 
     start...
     Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: creating conf.py file..
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing master file..
+    collective.recipe.sphinxbuilder: writing sphinxbuilder script..
     Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
 
@@ -183,6 +187,8 @@ If we want `latex` and `pdf`, we need to explicitly define it::
     >>> print 'start', system(buildout)
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing sphinxbuilder script..
     <BLANKLINE>
 
 Let's see our script now::
