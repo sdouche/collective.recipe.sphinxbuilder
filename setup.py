@@ -16,22 +16,22 @@ long_description = (
     'Detailed Documentation\n'
     '**********************\n'
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'README.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'about_sphinx.txt')
     + '\n' +
-    'Todo list\n' 
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'quick_start.txt')
+    + '\n' +
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'options.txt')
+    + '\n' +
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'usage.txt')
+    + '\n' +
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'contributors.txt')
+    + '\n' +
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'history.txt')
+    + '\n' +
+    'Todo list\n'
     '*********\n'
     + '\n' +
     read('TODO.txt')
-    + '\n' +
-    'Contributors\n' 
-    '************\n'
-    + '\n' +
-    read('CONTRIBUTORS.txt')
-    + '\n' +
-    'Change history\n'
-    '**************\n'
-    + '\n' + 
-    read('CHANGES.txt')
     + '\n' +
    'Download\n'
     '********\n'

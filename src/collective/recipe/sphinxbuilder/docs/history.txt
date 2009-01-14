@@ -5,6 +5,8 @@ Changes
 trunk (unreleased)
 ==================
 
+  - added sphinx-options and interpreter options [iElectric]
+  - added logging [iElectric]
   - fix issue, override source files in the templates directory
     using _import_templates [mr_savage]
 

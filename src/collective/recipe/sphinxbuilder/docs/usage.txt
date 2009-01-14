@@ -22,6 +22,10 @@ Let's run the buildout::
     >>> print 'start', system(buildout) 
     start...
     Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: creating conf.py file..
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing master file..
+    collective.recipe.sphinxbuilder: writing sphinxbuilder script..
     Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
 
@@ -32,23 +36,7 @@ A `docs` folder with a Sphinx structure::
     >>> docs = join(sample_buildout, 'docs')
     >>> ls(docs)
     - Makefile
-
-    >>> source = join(sample_buildout, 'parts', 'sphinxbuilder')
-    >>> ls(source) 
-    d  .static
-    d  .templates
-    -  conf.py
-    -  index.txt
-
-    >>> ls(join(source, '.templates'))
-    -  layout.html
-    -  modindex.html
-    -  search.html
-
-    >>> ls(join(source, '.static'))
-    -  options.tex
-    -  plone.css
-    -  plone_logo.png
+		d source
 
 A script in the `bin` folder to build the docs::
 
@@ -86,6 +74,8 @@ If we want `latex` and `pdf`, we need to explicitly define it::
     >>> print 'start', system(buildout)
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing sphinxbuilder script..
     <BLANKLINE>
 
 Let's see our script now::
@@ -101,16 +91,19 @@ Finally let's run it::
     >>> print 'start', system(script)
     start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
     ...
-    Transcript written in modPlone.ilg.
+    Transcript written in ...
     <BLANKLINE>
 
 We should have some nice reST file::
 
-    >>> print open(join(sample_buildout, 'parts', 'sphinxbuilder', 'index.txt')).read()
-    .. Plone documentation master file, ...
+    >>> print open(join(sample_buildout, 'docs', 'source', 'index.txt')).read()
+    .. SphinxBuilder documentation master file, created by sphinx-quickstart
+		on ...
+       You can adapt this file completely to your liking, but it should at least
+       contain the root `toctree` directive.
     <BLANKLINE>
-    Welcome to Plone's documentation!
-    =================================
+    Welcome to SphinxBuilder's documentation!
+    =========================================
     <BLANKLINE>
     Contents:
     <BLANKLINE>
@@ -125,9 +118,3 @@ We should have some nice reST file::
     * :ref:`search`
     <BLANKLINE>
     <BLANKLINE>
-
-And the html rendering should use the plone logo::
-
-    >>> html = open(join(docs, 'html', 'index.html')).read()
-    >>> 'plone_logo.png' in html
-    True
