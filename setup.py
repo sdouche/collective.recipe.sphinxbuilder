@@ -8,7 +8,8 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.5.1'
+version = '0.6.3'
+sphinx_version = '0.6.3'
 
 long_description = (
     read('README.txt')
@@ -62,18 +63,15 @@ setup(name='collective.recipe.sphinxbuilder',
       namespace_packages=['collective', 'collective.recipe'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=['setuptools',
-                        # -*- Extra requirements: -*-
-                        'zc.buildout',
-                        'zc.recipe.egg',
-                        'docutils',
-                        'Sphinx>=0.5.1'
-                        ],
+      install_requires=[
+            'setuptools',
+            'zc.buildout',
+            'zc.recipe.egg',
+            'docutils',
+            'Sphinx=='+sphinx_version],
       tests_require=['zope.testing', 'zc.buildout'],
       extras_require=dict(tests=['zope.testing', 'zc.buildout']),
       test_suite = 'collective.recipe.sphinxbuilder.tests.test_docs.test_suite',
-      entry_points = {"zc.buildout": ["default = collective.recipe.sphinxbuilder:Recipe",
-                                      "write = collective.recipe.sphinxbuilder:WriteRecipe",
-                                      "plone = collective.recipe.sphinxbuilder:PloneRecipe"]}
+      entry_points = {"zc.buildout": ["default = collective.recipe.sphinxbuilder:Recipe"]}
       )
 
