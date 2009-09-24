@@ -80,7 +80,10 @@ class Recipe(object):
         if 'latex' in self.outputs:
             script.append('make latex')
         if 'pdf' in self.outputs:
-            script.append('make latex && cd %s && make all-pdf' % os.path.join(self.build_dir, 'latex'))
+            latex = ''
+            if 'latex' not in self.outputs:
+                latex = 'make latex && '
+            script.append(latex+'cd %s && make all-pdf' % os.path.join(self.build_dir, 'latex'))
         self._write_file(self.script_path, '\n'.join(script))
         os.chmod(self.script_path, 0777)
 
@@ -107,7 +110,7 @@ class Recipe(object):
         #       -> ValueError: ('Expected version spec in', 
         #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
         self.egg.name = self.options['recipe']
-        requirements, ws = self.egg.working_set([self.options['recipe']])
+        requirements, ws = self.egg.working_set([self.options['recipe'], 'docutils'])
         zc.buildout.easy_install.scripts(
                 [('sphinx-quickstart', 'sphinx.quickstart', 'main'),
                  ('sphinx-build', 'sphinx', 'main')], ws,

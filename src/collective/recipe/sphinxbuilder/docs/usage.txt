@@ -19,8 +19,6 @@ Let's run the buildout::
 
     >>> print 'start', system(buildout) 
     start Installing sphinxbuilder.
-    Getting distribution for 'docutils'.
-    Got docutils 0.5.
     collective.recipe.sphinxbuilder: writing MAKEFILE..
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
@@ -66,6 +64,7 @@ If we want `latex` and `pdf`, we need to explicitly define it::
     ...
     ... [sphinxbuilder]
     ... recipe = collective.recipe.sphinxbuilder
+    ... source = collective.recipe.sphinxbuilder:docs
     ... outputs =
     ...     html
     ...     latex
@@ -85,37 +84,13 @@ Let's see our script now::
     cd ...docs
     make html
     make latex
-    make latex && cd /sample-buildout/docs/latex && make all-pdf
+    cd /sample-buildout/docs/latex && make all-pdf
 
 Finally let's run it::
 
     >>> print 'start', system(script)
-    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   /sample-buildout/docs/source /sample-buildout/docs/html
+    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   /home/rok/Projects/collective.recipe.sphinxbuilder/src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
     ...
     Transcript written in ...
     <BLANKLINE>
 
-We should have some nice reST file::
-
-    >>> print open(join(sample_buildout, 'docs', 'source', 'index.txt')).read()
-    .. SphinxBuilder documentation master file, created by sphinx-quickstart
-		on ...
-       You can adapt this file completely to your liking, but it should at least
-       contain the root `toctree` directive.
-    <BLANKLINE>
-    Welcome to SphinxBuilder's documentation!
-    =========================================
-    <BLANKLINE>
-    Contents:
-    <BLANKLINE>
-    .. toctree::
-       :maxdepth: 2
-    <BLANKLINE>
-    Indices and tables
-    ==================
-    <BLANKLINE>
-    * :ref:`genindex`
-    * :ref:`modindex`
-    * :ref:`search`
-    <BLANKLINE>
-    <BLANKLINE>
