@@ -28,14 +28,6 @@ long_description = (
     read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'contributors.txt')
     + '\n' +
     read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'history.txt')
-    + '\n' +
-    'Todo list\n'
-    '*********\n'
-    + '\n' +
-    read('TODO.txt')
-    + '\n' +
-   'Download\n'
-    '********\n'
     )
 
 
@@ -75,3 +67,4 @@ setup(name='collective.recipe.sphinxbuilder',
       entry_points = {"zc.buildout": ["default = collective.recipe.sphinxbuilder:Recipe"]}
       )
 
+# python setup.py --long-description | rst2html.py > /dev/null

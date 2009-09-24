@@ -10,9 +10,8 @@ import zc.buildout
 import zc.recipe.egg
 from datetime import datetime
 
-#from sphinx.quickstart import QUICKSTART_CONF
-from sphinx.quickstart import MAKEFILE, BATCHFILE
-#from sphinx.quickstart import MASTER_FILE
+from sphinx.quickstart import MAKEFILE
+from sphinx.quickstart import BATCHFILE
 from sphinx.util import make_filename
 
 
@@ -33,7 +32,6 @@ class Recipe(object):
         self.outputs = options.get('outputs', 'html')
 
         self.build_dir = os.path.join(self.buildout_dir, options.get('build', 'docs'))
-        self.latex_dir = os.path.join(self.buildout_dir, options.get('build-latex', 'docs-latex'))
         self.source_dir = options.get('source', os.path.join(self.build_dir, 'source'))
         self.extra_paths = self.options.get('extra-paths', None)
         
@@ -82,16 +80,12 @@ class Recipe(object):
         if 'latex' in self.outputs:
             script.append('make latex')
         if 'pdf' in self.outputs:
-            script.append('make latex && cd %s && make' % self.latex_dir)
+            script.append('make latex && cd %s && make all-pdf' % os.path.join(self.build_dir, 'latex'))
         self._write_file(self.script_path, '\n'.join(script))
         os.chmod(self.script_path, 0777)
 
         # 5. INSTALL SPHINX WITH SCRIPT AND EXTRA PATHS
         
-        # WEIRD: this is needed for doctest to pass
-        # :write gives error 
-        #       -> ValueError: ('Expected version spec in', 
-        #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
         # 5.1. Setup extra Products namespace for old-style Zope products.
         product_directories = [d for d in self.product_dirs.split()]
         if product_directories:
@@ -108,8 +102,12 @@ class Recipe(object):
             log.info('inserting products directories..')
             egg_options['initialization'] = initialization
 
-        self.egg.name = 'collective.recipe.sphinxbuilder'
-        requirements, ws = self.egg.working_set(['collective.recipe.sphinxbuilder'])
+        # WEIRD: this is needed for doctest to pass
+        # :write gives error 
+        #       -> ValueError: ('Expected version spec in', 
+        #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
+        self.egg.name = self.options['recipe']
+        requirements, ws = self.egg.working_set([self.options['recipe']])
         zc.buildout.easy_install.scripts(
                 [('sphinx-quickstart', 'sphinx.quickstart', 'main'),
                  ('sphinx-build', 'sphinx', 'main')], ws,

@@ -1,3 +1,0 @@
- * custom source folder should be created on start
-
- * write some .ini to python script for full conf.py integration

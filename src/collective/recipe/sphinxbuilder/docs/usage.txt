@@ -11,21 +11,20 @@ buildout that uses the recipe::
     ... parts = sphinxbuilder
     ...
     ... [sphinxbuilder]
-    ... recipe = collective.recipe.sphinxbuilder:write
-    ... project = SphinxBuilder
-    ... version = 0.5.1
-    ... release = 0.5.1
+    ... recipe = collective.recipe.sphinxbuilder
+    ... source = collective.recipe.sphinxbuilder:docs
     ... """) 
 
 Let's run the buildout::
 
     >>> print 'start', system(buildout) 
-    start...
-    Installing sphinxbuilder.
-    collective.recipe.sphinxbuilder: creating conf.py file..
+    start Installing sphinxbuilder.
+    Getting distribution for 'docutils'.
+    Got docutils 0.5.
     collective.recipe.sphinxbuilder: writing MAKEFILE..
-    collective.recipe.sphinxbuilder: writing master file..
-    collective.recipe.sphinxbuilder: writing sphinxbuilder script..
+    collective.recipe.sphinxbuilder: writing BATCHFILE..
+    collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
+    Generated script '/sample-buildout/bin/sphinx-quickstart'.
     Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
 
@@ -36,7 +35,7 @@ A `docs` folder with a Sphinx structure::
     >>> docs = join(sample_buildout, 'docs')
     >>> ls(docs)
     - Makefile
-		d source
+    -  make.bat
 
 A script in the `bin` folder to build the docs::
 
@@ -44,6 +43,7 @@ A script in the `bin` folder to build the docs::
     >>> ls(bin)
     - buildout
     - sphinx-build
+    - sphinx-quickstart
     - sphinxbuilder
 
 The content of the script is a simple shell script::
@@ -54,7 +54,7 @@ The content of the script is a simple shell script::
     make html
     
     >>> print 'start', system(script)
-    start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
+    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   /home/rok/Projects/collective.recipe.sphinxbuilder/src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
     ...
    
 If we want `latex` and `pdf`, we need to explicitly define it::
@@ -75,7 +75,8 @@ If we want `latex` and `pdf`, we need to explicitly define it::
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
     collective.recipe.sphinxbuilder: writing MAKEFILE..
-    collective.recipe.sphinxbuilder: writing sphinxbuilder script..
+    collective.recipe.sphinxbuilder: writing BATCHFILE..
+    collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
     <BLANKLINE>
 
 Let's see our script now::
@@ -84,12 +85,12 @@ Let's see our script now::
     cd ...docs
     make html
     make latex
-    make latex && cd ... && make
+    make latex && cd /sample-buildout/docs/latex && make all-pdf
 
 Finally let's run it::
 
     >>> print 'start', system(script)
-    start mkdir -p /sample-buildout/docs/html /sample-buildout/docs/doctrees
+    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   /sample-buildout/docs/source /sample-buildout/docs/html
     ...
     Transcript written in ...
     <BLANKLINE>

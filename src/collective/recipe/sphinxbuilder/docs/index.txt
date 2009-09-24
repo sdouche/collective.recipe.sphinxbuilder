@@ -5,13 +5,13 @@
 Welcome to SphinxBuilder's documentation!
 =========================================
 
+zc.buildout recipe to generate and build Sphinx-based documentation in the buildout.
+
 :Date: |today|
 :Version: |version|
 :Release: |release|
-:Code repository: https://svn.plone.org/svn/collective/buildout/collective.recipe.sphinxbuilder/
-:Questions and comments: tarek_at_ziade.org
-
-zc.buildout recipe to generate and build Sphinx-based documentation in the buildout.
+:Code repository: https://svn.plone.org/svn/collective/buildout/collective.recipe.sphinxbuilder
+:Questions and comments: tarek_at_ziade.org, rok_at_garbas.si
 
 Table of contents
 =================
@@ -23,7 +23,6 @@ Table of contents
     quick_start
     options
     usage
-    generate-this-doc
     reference
     history
     contributors

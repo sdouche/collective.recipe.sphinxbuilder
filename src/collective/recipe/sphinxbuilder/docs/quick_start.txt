@@ -12,21 +12,33 @@ a section like this::
         ...
     
     [sphinxbuilder]
-    recipe = collective.recipe.sphinxbuilder:write
+    recipe = collective.recipe.sphinxbuilder
+    source = ${buildout:directory}/docs-source
+    build = ${buildout:directory}/docs
+    
 
 
-That's it ! Run your buildout and you will get:
+Run your buildout and you will get a few new scripts in the `bin` folder,
+called:
 
-- a new script in the `bin` folder, called  `sphinxbuilder`
-- a `parts/sphinxbuilder` directory containing your documentation.
+    - `sphinx-quickstart`, to quickstart sphinx documentation
+    - `sphinxbuilder`, script that will 
+
+To quickstart a documentation project run, as you would normaly do with Sphinx::
+
+    $ bin/sphinx-quickstart
+
+and anwser few questions and choose `docs-source` as you source folder.
 
 To build your documentation, just run the sphinx script::
 
     $ bin/sphinxbuilder
 
+That's it !
+
 You will get a shiny Sphinx documenation in `docs/html`.
-To write your documentation, go in `docs/source`, if there is none create it.
-Everytime source is modified, run the buildout and script again.
+Write your documentation, go in `docs-source`.
+Everytime source is modified, `sphinxbuilder` run script again.
 
 A good starting point to write your documentation is: 
 http://sphinx.pocoo.org/contents.html.

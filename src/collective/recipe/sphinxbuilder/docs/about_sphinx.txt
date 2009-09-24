@@ -1,5 +1,3 @@
-.. index:: sphinx
-
 ================
 What is Sphinx ?
 ================
