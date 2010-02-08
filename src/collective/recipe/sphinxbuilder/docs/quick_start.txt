@@ -42,3 +42,23 @@ Everytime source is modified, `sphinxbuilder` run script again.
 
 A good starting point to write your documentation is: 
 http://sphinx.pocoo.org/contents.html.
+
+
+=======
+Plone 4
+=======
+
+Usage with Plone 4 is even easier::
+
+    [buildout]
+    parts =
+        ...
+        sphinxbuilder
+        ...
+    
+    [sphinxbuilder]
+    recipe = collective.recipe.sphinxbuilder
+    interpreter = ${buildout:directory}/bin/zopepy
+
+Follow quick-start tutorial and do not forget to add interpreter with
+installed eggs to access your sourcecode with Sphinx.
