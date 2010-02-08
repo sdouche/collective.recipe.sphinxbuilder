@@ -43,7 +43,7 @@ class Recipe(object):
         self.re_sphinxbuild = re.compile(r'^SPHINXBUILD .*$', re.M)
         self.build_command = os.path.join(self.bin_dir, 'sphinx-build')
         if self.interpreter:
-            self.build_command = ' '.join([self.interpreter, build_command])
+            self.build_command = ' '.join([self.interpreter, self.build_command])
 
     def install(self):
         """Installer"""
