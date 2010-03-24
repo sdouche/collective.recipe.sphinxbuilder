@@ -100,7 +100,7 @@ class Recipe(object):
         egg_options = {}
         if self.extra_paths:
             log.info('inserting extra-paths..')
-            egg_options['extra_paths'] = extra_paths.split()
+            egg_options['extra_paths'] = self.extra_paths.split()
         if product_directories:
             log.info('inserting products directories..')
             egg_options['initialization'] = initialization
