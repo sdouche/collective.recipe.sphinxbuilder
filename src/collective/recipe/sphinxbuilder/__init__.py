@@ -10,10 +10,6 @@ import zc.buildout
 import zc.recipe.egg
 from datetime import datetime
 
-from sphinx.quickstart import MAKEFILE
-from sphinx.quickstart import BATCHFILE
-from sphinx.util import make_filename
-
 
 log = logging.getLogger(__name__)
 
@@ -55,6 +51,26 @@ class Recipe(object):
         # 2. RESOLVE SOURCE PATH
         if not os.path.isabs(self.source_dir):
             self.source_dir = self._resolve_path(self.source_dir)
+
+        # we need extra_paths, e.g for docutils via fake-eggs
+        # most probably this should be really fixed in buildout or the way
+        # fake-zope-eggs messes with buildout - until then: This enables sphinx
+        # to coexist in a buildout with fake-zope-eggs.
+        extra_paths = []
+        if self.extra_paths:
+            extra_paths = self.extra_paths.split()
+            sys.path.extend(extra_paths)
+
+        from sphinx.quickstart import MAKEFILE
+        from sphinx.quickstart import BATCHFILE
+        from sphinx.util import make_filename
+
+        # and cleanup again
+        if extra_paths:
+            sys.path.reverse()
+            for x in extra_paths:
+                sys.path.remove(x)
+            sys.path.reverse()
 
         # 3. CREATE MAKEFILE
         log.info('writing MAKEFILE..')
