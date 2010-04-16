@@ -9,7 +9,7 @@ def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 version = '0.6.3.2'
-sphinx_version = '0.6.4'
+sphinx_version = '>=0.6.4,<0.7dev'
 
 long_description = (
     read('README.txt')
@@ -60,7 +60,7 @@ setup(name='collective.recipe.sphinxbuilder',
             'zc.buildout',
             'zc.recipe.egg',
             'docutils',
-            'Sphinx=='+sphinx_version],
+            'Sphinx'+sphinx_version],
       tests_require=['zope.testing', 'zc.buildout'],
       extras_require=dict(tests=['zope.testing', 'zc.buildout']),
       test_suite = 'collective.recipe.sphinxbuilder.tests.test_docs.test_suite',
