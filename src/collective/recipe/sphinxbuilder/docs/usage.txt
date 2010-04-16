@@ -52,10 +52,53 @@ The content of the script is a simple shell script::
     make html
     
     >>> print 'start', system(script)
-    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   /home/rok/Projects/collective.recipe.sphinxbuilder/src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
+    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees ...src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
     ...
    
-If we want `latex` and `pdf`, we need to explicitly define it::
+If we want `latex`, we need to explicitly define it::
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = sphinxbuilder
+    ...
+    ... [sphinxbuilder]
+    ... recipe = collective.recipe.sphinxbuilder
+    ... source = collective.recipe.sphinxbuilder:docs
+    ... outputs =
+    ...     html
+    ...     latex
+    ... """) 
+    >>> print 'start', system(buildout)
+    start Uninstalling sphinxbuilder.
+    Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing BATCHFILE..
+    collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
+    <BLANKLINE>
+
+Let's see our script now::
+    
+    >>> cat(script)
+    cd ...docs
+    make html
+    make latex
+
+Finally let's run it::
+
+    >>> print 'start', system(script)
+    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   .../src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
+    ...
+    <BLANKLINE>
+    Build finished. The HTML pages are in /sample-buildout/docs/html.
+    ...
+    Build finished; the LaTeX files are in /sample-buildout/docs/latex.
+    Run `make all-pdf' or `make all-ps' in that directory to run these through (pdf)latex.
+    <BLANKLINE>
+    Making output directory...    
+    <BLANKLINE>
+
+If we want `pdf`, we need to explicitly define it::
 
     >>> write('buildout.cfg',
     ... """
@@ -86,11 +129,36 @@ Let's see our script now::
     make latex
     cd /sample-buildout/docs/latex && make all-pdf
 
-Finally let's run it::
+We will skip running the script in tests, because the PDF builder depends
+on libraries which may not be installed.
 
-    >>> print 'start', system(script)
-    start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   /home/rok/Projects/collective.recipe.sphinxbuilder/src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
+We can also have the script run any doctests in the docs while building::
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = sphinxbuilder
     ...
-    Transcript written in ...
+    ... [sphinxbuilder]
+    ... recipe = collective.recipe.sphinxbuilder
+    ... source = collective.recipe.sphinxbuilder:docs
+    ... outputs =
+    ...     doctest
+    ...     html
+    ... """) 
+    >>> print 'start', system(buildout)
+    start Uninstalling sphinxbuilder.
+    Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing BATCHFILE..
+    collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
     <BLANKLINE>
 
+Let's see our script now::
+    
+    >>> cat(script)
+    cd ...docs
+    make doctest
+    make html
+
+Again, we will skip running them, this time to avoid a recursive fork bomb. ;)

@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '0.6.3.2'
+version = '0.6.3.2+'
 sphinx_version = '>=0.6.4,<0.7dev'
 
 long_description = (

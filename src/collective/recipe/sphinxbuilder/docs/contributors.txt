@@ -7,3 +7,4 @@ Contributors
  * Sidnei da Silva
  * Hans-Peter Locher, aka mr_savage
  * Domen Kozar, aka iElectric
+ * Tres Seaver

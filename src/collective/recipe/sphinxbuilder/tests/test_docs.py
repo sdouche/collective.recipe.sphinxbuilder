@@ -21,8 +21,12 @@ def setUp(test):
     zc.buildout.testing.install_develop('collective.recipe.sphinxbuilder', test)
 
     # Install any other recipes that should be available in the tests
-    for p in ['Sphinx==0.6.3', 'zc.recipe.egg', 'Jinja2>=2.1', 'Pygments>=0.8',
-              'docutils>=0.4']:
+    for p in ['Sphinx>=0.6.3,<0.7dev',
+              'zc.recipe.egg',
+              'Jinja2>=2.1',
+              'Pygments>=0.8',
+              'docutils>=0.4',
+             ]:
         # TODO :: dont know why install methos is not working
         # upper recipes are not found in path
         zc.buildout.testing.install_develop(p, test)

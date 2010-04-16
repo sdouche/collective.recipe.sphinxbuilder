@@ -2,6 +2,14 @@
 Changes
 =======
 
+After 0.6.3.2
+=============
+
+  - added `doctest` option to recipe's `output` options (tseaver)
+
+  - relaxed required version of Sphinx to allow versions later than
+    0.6.4 (but still less than 0.7dev).
+
 0.6.3.2 (2010-02-08)
 ====================
 
