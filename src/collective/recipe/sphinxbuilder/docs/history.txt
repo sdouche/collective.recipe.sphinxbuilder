@@ -2,8 +2,8 @@
 Changes
 =======
 
-After 0.6.3.2
-=============
+0.6.3.3 (2010-07-15)
+==========================
 
   - added `doctest` option to recipe's `output` options (tseaver)
 
