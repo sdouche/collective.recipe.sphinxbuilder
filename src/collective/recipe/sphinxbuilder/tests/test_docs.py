@@ -4,33 +4,44 @@ Doctest runner for 'collective.recipe.sphinxbuilder'.
 """
 __docformat__ = 'restructuredtext'
 
+import doctest
+import pkg_resources
 import unittest
 import zc.buildout.tests
 import zc.buildout.testing
+from zope.testing import renormalizing
 
-from zope.testing import doctest, renormalizing
 
 optionflags =  (doctest.ELLIPSIS |
                 doctest.NORMALIZE_WHITESPACE |
                 doctest.REPORT_ONLY_FIRST_FAILURE)
 
+def get_dependent_dists(pkg):
+    """Get list of eggs required by `pkg`.
+
+    Recursively get a list of egg names required by `pkg`.
+    """
+    result = []
+    distr = pkg_resources.get_distribution(pkg)
+    for req in distr.requires():
+        result.extend(get_dependent_dists(req))
+    name = distr.project_name
+    if name not in [
+        # Packages that are made available by zc.buildout automatically.
+        'setuptools', 'zc.buildout',
+        ]:
+        result.append(name)
+    return result
+                      
+
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
 
-    # Install the recipe in develop mode
-    zc.buildout.testing.install_develop('collective.recipe.sphinxbuilder', test)
-
-    # Install any other recipes that should be available in the tests
-    for p in ['Sphinx>=0.6.3,<0.7dev',
-              'zc.recipe.egg',
-              'Jinja2>=2.1',
-              'Pygments>=0.8',
-              'docutils>=0.4',
-             ]:
-        # TODO :: dont know why install methos is not working
-        # upper recipes are not found in path
+    # Install any eggs that should be available in the tests
+    # (zc.buildout does not make them available automatically but sets up
+    # an own site_packages).
+    for p in get_dependent_dists('collective.recipe.sphinxbuilder[tests]'):
         zc.buildout.testing.install_develop(p, test)
-
 
 def test_suite():
     suite = unittest.TestSuite((
