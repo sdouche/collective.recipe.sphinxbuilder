@@ -2,7 +2,7 @@
 Example usage
 =============
 
-The recipe can be used without any options. We'll start by creating a 
+The recipe can be used without any options. We'll start by creating a
 buildout that uses the recipe::
 
     >>> write('buildout.cfg',
@@ -13,11 +13,11 @@ buildout that uses the recipe::
     ... [sphinxbuilder]
     ... recipe = collective.recipe.sphinxbuilder
     ... source = collective.recipe.sphinxbuilder:docs
-    ... """) 
+    ... """)
 
 Let's run the buildout::
 
-    >>> print 'start', system(buildout) 
+    >>> print 'start', system(buildout)
     start Installing sphinxbuilder.
     collective.recipe.sphinxbuilder: writing MAKEFILE..
     collective.recipe.sphinxbuilder: writing BATCHFILE..
@@ -26,7 +26,7 @@ Let's run the buildout::
     Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
 
-What are we expecting ? 
+What are we expecting ?
 
 A `docs` folder with a Sphinx structure::
 
@@ -50,11 +50,11 @@ The content of the script is a simple shell script::
     >>> print open(script).read()
     cd ...docs
     make html
-    
+
     >>> print 'start', system(script)
     start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees ...src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
     ...
-   
+
 If we want `latex`, we need to explicitly define it::
 
     >>> write('buildout.cfg',
@@ -68,7 +68,7 @@ If we want `latex`, we need to explicitly define it::
     ... outputs =
     ...     html
     ...     latex
-    ... """) 
+    ... """)
     >>> print 'start', system(buildout)
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -78,7 +78,7 @@ If we want `latex`, we need to explicitly define it::
     <BLANKLINE>
 
 Let's see our script now::
-    
+
     >>> cat(script)
     cd ...docs
     make html
@@ -94,7 +94,7 @@ Finally let's run it::
     ...
     Build finished; the LaTeX files are in /sample-buildout/docs/latex.
     Run `make' in that directory to run these through (pdf)latex...
-    Making output directory...    
+    Making output directory...
     <BLANKLINE>
 
 If we want `pdf`, we need to explicitly define it::
@@ -111,7 +111,7 @@ If we want `pdf`, we need to explicitly define it::
     ...     html
     ...     latex
     ...     pdf
-    ... """) 
+    ... """)
     >>> print 'start', system(buildout)
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -121,7 +121,7 @@ If we want `pdf`, we need to explicitly define it::
     <BLANKLINE>
 
 Let's see our script now::
-    
+
     >>> cat(script)
     cd ...docs
     make html
@@ -144,7 +144,7 @@ We can also have the script run any doctests in the docs while building::
     ... outputs =
     ...     doctest
     ...     html
-    ... """) 
+    ... """)
     >>> print 'start', system(buildout)
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -154,10 +154,35 @@ We can also have the script run any doctests in the docs while building::
     <BLANKLINE>
 
 Let's see our script now::
-    
+
     >>> cat(script)
     cd ...docs
     make doctest
     make html
 
 Again, we will skip running them, this time to avoid a recursive fork bomb. ;)
+
+If we want `extra-paths`, we can define them as normal paths or as unix
+wildcards (see `fnmatch` module) ::
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = sphinxbuilder
+    ...
+    ... [sphinxbuilder]
+    ... recipe = collective.recipe.sphinxbuilder
+    ... source = collective.recipe.sphinxbuilder:docs
+    ... extra-paths =
+    ...     develop-eggs/
+    ...     eggs/*
+    ... """)
+    >>> print 'start', system(buildout)
+    start Uninstalling sphinxbuilder.
+    Installing sphinxbuilder.
+    collective.recipe.sphinxbuilder: writing MAKEFILE..
+    collective.recipe.sphinxbuilder: writing BATCHFILE..
+    collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
+    collective.recipe.sphinxbuilder: inserting extra-paths..
+    Generated script '/sample-buildout/bin/sphinx-quickstart'.
+    Generated script '/sample-buildout/bin/sphinx-build'.
+    <BLANKLINE>

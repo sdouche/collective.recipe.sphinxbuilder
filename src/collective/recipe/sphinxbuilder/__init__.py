@@ -9,6 +9,7 @@ import shutil
 import zc.buildout
 import zc.recipe.egg
 from datetime import datetime
+from fnmatch import fnmatch
 
 
 log = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class Recipe(object):
         self.build_dir = os.path.join(self.buildout_dir, options.get('build', 'docs'))
         self.source_dir = options.get('source', os.path.join(self.build_dir, 'source'))
         self.extra_paths = self.options.get('extra-paths', None)
-        
+
         self.script_name = options.get('script-name', name)
         self.script_path = os.path.join(self.bin_dir, self.script_name)
         self.makefile_path = os.path.join(self.build_dir, 'Makefile')
@@ -47,7 +48,7 @@ class Recipe(object):
         # 1. CREATE BUILD FOLDER IF IT DOESNT EXISTS
         if not os.path.exists(self.build_dir):
             os.mkdir(self.build_dir)
-        
+
         # 2. RESOLVE SOURCE PATH
         if not os.path.isabs(self.source_dir):
             self.source_dir = self._resolve_path(self.source_dir)
@@ -58,7 +59,12 @@ class Recipe(object):
         # to coexist in a buildout with fake-zope-eggs.
         extra_paths = []
         if self.extra_paths:
-            extra_paths = self.extra_paths.split()
+            for extra_path in self.extra_paths.split():
+                dir = os.path.dirname(extra_path)
+                for filename in os.listdir(dir):
+                    filename = os.path.join(dir, filename)
+                    if fnmatch(filename, extra_path):
+                        extra_paths.append(filename)
             sys.path.extend(extra_paths)
 
         from sphinx.quickstart import MAKEFILE
@@ -106,7 +112,7 @@ class Recipe(object):
         os.chmod(self.script_path, 0777)
 
         # 5. INSTALL SPHINX WITH SCRIPT AND EXTRA PATHS
-        
+
         # 5.1. Setup extra Products namespace for old-style Zope products.
         product_directories = [d for d in self.product_dirs.split()]
         if product_directories:
@@ -116,16 +122,16 @@ class Recipe(object):
                                    product_directory)
 
         egg_options = {}
-        if self.extra_paths:
+        if extra_paths:
             log.info('inserting extra-paths..')
-            egg_options['extra_paths'] = self.extra_paths.split()
+            egg_options['extra_paths'] = extra_paths
         if product_directories:
             log.info('inserting products directories..')
             egg_options['initialization'] = initialization
 
         # WEIRD: this is needed for doctest to pass
-        # :write gives error 
-        #       -> ValueError: ('Expected version spec in', 
+        # :write gives error
+        #       -> ValueError: ('Expected version spec in',
         #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
         self.egg.name = self.options['recipe']
         requirements, ws = self.egg.working_set([self.options['recipe'], 'docutils'])
@@ -160,4 +166,3 @@ class Recipe(object):
             f.write(content)
         finally:
             f.close()
-
