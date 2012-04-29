@@ -2,9 +2,10 @@
 Contributors
 ============
 
- * Tarek Ziade, Author
- * Rok Garbas, likes mandarines
+ * Tarek Ziade, original author
+ * Rok Garbas
  * Sidnei da Silva
- * Hans-Peter Locher, aka mr_savage
- * Domen Kozar, aka iElectric
+ * Hans-Peter Locher
+ * Domen Kozar
  * Tres Seaver
+ * Sébastien Douche, maintainer

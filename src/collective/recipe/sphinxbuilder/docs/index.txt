@@ -10,8 +10,8 @@ zc.buildout recipe to generate and build Sphinx-based documentation in the build
 :Date: |today|
 :Version: |version|
 :Release: |release|
-:Code repository: https://svn.plone.org/svn/collective/buildout/collective.recipe.sphinxbuilder
-:Questions and comments: tarek_at_ziade.org, rok_at_garbas.si
+:Code repository: https://github.com/sdouche/collective.recipe.sphinxbuilder
+:Questions and comments: tarek_at_ziade.org, rok_at_garbas.si, sdouche_at_gmail.com
 
 Table of contents
 =================

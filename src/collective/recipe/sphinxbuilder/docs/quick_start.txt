@@ -34,7 +34,7 @@ To build your documentation, just run the sphinx script::
 
     $ bin/sphinxbuilder
 
-That's it !
+That's it!
 
 You will get a shiny Sphinx documenation in `docs/html`.
 Write your documentation, go in `docs-source`.
