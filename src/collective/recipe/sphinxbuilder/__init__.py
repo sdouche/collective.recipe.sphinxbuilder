@@ -103,6 +103,8 @@ class Recipe(object):
             script.append('make html')
         if 'latex' in self.outputs:
             script.append('make latex')
+        if 'epub' in self.outputs:
+            script.append('make epub')
         if 'pdf' in self.outputs:
             latex = ''
             if 'latex' not in self.outputs:

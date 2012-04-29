@@ -12,7 +12,7 @@ The recipe supports the following options:
 
     outputs (default: `html`)
         Multiple-line value that defines what kind of output to produce. 
-        Can be `doctest`, `html`, `latex` or `pdf`.
+        Can be `doctest`, `html`, `latex`, `pdf` or `epub`.
 
     script-name (default: name of buildout section)
         The name of the script generated
