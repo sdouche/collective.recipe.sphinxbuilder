@@ -2,9 +2,10 @@
 Changes
 =======
 
-0.7.1 (unreleased):
+0.7.1 (2012-04-29):
 ===================
 
+  - Add the epub output.
   - Fixed tests:
     - Use required package versions during tests
     - Use standard `doctest` instead of `zope.testing.doctest`.
