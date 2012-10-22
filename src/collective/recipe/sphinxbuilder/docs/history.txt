@@ -2,21 +2,26 @@
 Changes
 =======
 
-0.7.1 (2012-04-29):
-===================
+0.7.2 (2012-10-22)
+==================
+
+  - requires Sphinx >= 1.1
+
+0.7.1 (2012-04-29)
+==================
 
   - Add the epub output.
   - Fixed tests:
     - Use required package versions during tests
     - Use standard `doctest` instead of `zope.testing.doctest`.
 
-0.7.0 (2010-09-10):
-===================
+0.7.0 (2010-09-10)
+==================
 
   - requires Sphinx >= 1.0
 
 0.6.3.3 (2010-07-15)
-==========================
+====================
 
   - added `doctest` option to recipe's `output` options (tseaver)
 
