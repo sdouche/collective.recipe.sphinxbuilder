@@ -22,6 +22,7 @@ epub latex latexpdf text man changes linkcheck doctest gettext
 help:
 \t@echo "Please use \\`make <target>' where <target> is one of"
 \t@echo "  html       to make standalone HTML files"
+\t@echo "  warnings-html to make standalone HTML files (warnings become errors)"
 \t@echo "  dirhtml    to make HTML files named index.html in directories"
 \t@echo "  singlehtml to make a single large HTML file"
 \t@echo "  pickle     to make pickle files"
@@ -185,6 +186,7 @@ if "%%1" == "help" (
 \t:help
 \techo.Please use `make ^<target^>` where ^<target^> is one of
 \techo.  html       to make standalone HTML files
+\techo.  warnings-html to make standalone HTML files (turn warnings into errors)
 \techo.  dirhtml    to make HTML files named index.html in directories
 \techo.  singlehtml to make a single large HTML file
 \techo.  pickle     to make pickle files

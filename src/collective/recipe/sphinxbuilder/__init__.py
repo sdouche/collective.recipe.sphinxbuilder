@@ -67,8 +67,8 @@ class Recipe(object):
                         extra_paths.append(filename)
             sys.path.extend(extra_paths)
 
-        from sphinx.quickstart import MAKEFILE
-        from sphinx.quickstart import BATCHFILE
+        from utils import MAKEFILE
+        from utils import BATCHFILE
         from sphinx.util import make_filename
 
         # and cleanup again
@@ -142,6 +142,26 @@ class Recipe(object):
                  ('sphinx-build', 'sphinx', 'main')], ws,
                 self.buildout[self.buildout['buildout']['python']]['executable'],
                 self.bin_dir, **egg_options)
+
+        # patch sphinx-build script
+        # change last line from sphinx.main() to sys.exit(sphinx.main())
+        # so that errors are correctly reported to Travis CI.
+        
+        sb = os.path.join(self.bin_dir, 'sphinx-build')
+        #Create temp file
+        fh, abs_path = mkstemp()
+        new_file = open(abs_path,'w')
+        old_file = open(sb)
+        for line in old_file:
+            new_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
+        #close temp file
+        new_file.close()
+        os.close(fh)
+        old_file.close()
+        #Remove original file
+        os.remove(sb)
+        #Move new file
+        shutil.move(abs_path, sb)
 
         return [self.script_path, self.makefile_path, self.batchfile_path]
 
