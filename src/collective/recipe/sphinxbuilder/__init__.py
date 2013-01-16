@@ -148,12 +148,15 @@ class Recipe(object):
         # so that errors are correctly reported to Travis CI.        
         sb = os.path.join(self.bin_dir, 'sphinx-build')
         temp_file = StringIO()
-        old_file = open(sb,'r+')
-        for line in old_file:
+        sb_file = open(sb,'r')
+        for line in sb_file:
             temp_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
-        old_file.write(temp_file.getvalue())
+        # open for writing (delete contents existing contents before rewritng 
+        # from StringIO that contains the modification
+        sb_file = open(sb,'w')
+        sb_file.write(temp_file.getvalue())
         temp_file.close()
-        old_file.close()
+        sb_file.close()
 
         return [self.script_path, self.makefile_path, self.batchfile_path]
 
