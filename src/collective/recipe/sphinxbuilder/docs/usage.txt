@@ -212,6 +212,4 @@ wildcards (see `fnmatch` module) ::
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
     collective.recipe.sphinxbuilder: inserting extra-paths..
-    Generated script '/sample-buildout/bin/sphinx-quickstart'.
-    Generated script '/sample-buildout/bin/sphinx-build'.
     <BLANKLINE>
