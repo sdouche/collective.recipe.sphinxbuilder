@@ -10,7 +10,7 @@ import zc.buildout
 import zc.recipe.egg
 from datetime import datetime
 from fnmatch import fnmatch
-
+from cStringIO import StringIO
 
 log = logging.getLogger(__name__)
 
@@ -145,23 +145,15 @@ class Recipe(object):
 
         # patch sphinx-build script
         # change last line from sphinx.main() to sys.exit(sphinx.main())
-        # so that errors are correctly reported to Travis CI.
-        
+        # so that errors are correctly reported to Travis CI.        
         sb = os.path.join(self.bin_dir, 'sphinx-build')
-        #Create temp file
-        fh, abs_path = mkstemp()
-        new_file = open(abs_path,'w')
-        old_file = open(sb)
+        temp_file = StringIO()
+        old_file = open(sb,'r+')
         for line in old_file:
-            new_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
-        #close temp file
-        new_file.close()
-        os.close(fh)
+            temp_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
+        old_file.write(temp_file.getvalue())
+        temp_file.close()
         old_file.close()
-        #Remove original file
-        os.remove(sb)
-        #Move new file
-        shutil.move(abs_path, sb)
 
         return [self.script_path, self.makefile_path, self.batchfile_path]
 
