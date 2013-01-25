@@ -24,6 +24,8 @@ Let's run the buildout::
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
     Generated script '/sample-buildout/bin/sphinx-quickstart'.
     Generated script '/sample-buildout/bin/sphinx-build'.
+    Generated script '/sample-buildout/bin/sphinx-apidoc'.
+    Generated script '/sample-buildout/bin/sphinx-autogen'.
     <BLANKLINE>
 
 What are we expecting?
@@ -40,6 +42,8 @@ A script in the `bin` folder to build the docs::
     >>> bin = join(sample_buildout, 'bin')
     >>> ls(bin)
     - buildout
+    - sphinx-apidoc
+    - sphinx-autogen
     - sphinx-build
     - sphinx-quickstart
     - sphinxbuilder
