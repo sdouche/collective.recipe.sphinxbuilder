@@ -11,22 +11,22 @@ def read(*rnames):
 version = '0.7.2'
 
 long_description = (
-    read('README.txt')
+    read('README.rst')
     + '\n' +
     'Detailed Documentation\n'
     '**********************\n'
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'about_sphinx.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'about_sphinx.rst')
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'quick_start.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'quick_start.rst')
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'options.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'options.rst')
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'usage.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'usage.rst')
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'contributors.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'contributors.rst')
     + '\n' +
-    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'history.txt')
+    read('src', 'collective', 'recipe', 'sphinxbuilder', 'docs', 'history.rst')
     )
 
 
