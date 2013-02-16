@@ -2,6 +2,14 @@
 Changes
 =======
 
+0.7.3 (2013-02-16)
+==================
+
+  - patch sphinx-build script to terminate with sys.exit()
+  - add warnings-html makefile option
+  - install sphinx-apidoc and sphinx-autogen scripts
+  - rename all txt files to rst ones
+
 0.7.2 (2012-10-22)
 ==================
 
