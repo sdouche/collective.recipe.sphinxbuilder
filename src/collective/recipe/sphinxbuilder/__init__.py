@@ -5,14 +5,13 @@ import logging
 import os
 import re
 import sys
-import shutil
 import zc.buildout
 import zc.recipe.egg
-from datetime import datetime
 from fnmatch import fnmatch
 from cStringIO import StringIO
 
 log = logging.getLogger(__name__)
+
 
 class Recipe(object):
     """zc.buildout recipe"""
@@ -69,7 +68,6 @@ class Recipe(object):
 
         from utils import MAKEFILE
         from utils import BATCHFILE
-        from sphinx.util import make_filename
 
         # and cleanup again
         if extra_paths:
@@ -81,18 +79,17 @@ class Recipe(object):
         # 3. CREATE MAKEFILE
         log.info('writing MAKEFILE..')
         self._write_file(self.makefile_path,
-            self.re_sphinxbuild.sub(r'SPHINXBUILD = %s' % (self.build_command),
-                MAKEFILE % dict( rsrcdir = self.source_dir,
-                                 rbuilddir = self.build_dir,
-                                 project_fn = self.script_name )))
-
+                         self.re_sphinxbuild.sub(r'SPHINXBUILD = %s' % (self.build_command),
+                                                 MAKEFILE % dict(rsrcdir=self.source_dir,
+                                                                 rbuilddir=self.build_dir,
+                                                                 project_fn=self.script_name)))
         # 4. CREATE BATCHFILE
         log.info('writing BATCHFILE..')
         self._write_file(self.batchfile_path,
-            self.re_sphinxbuild.sub(r'SPHINXBUILD = %s' % (self.build_command),
-                BATCHFILE % dict( rsrcdir = self.source_dir,
-                                  rbuilddir = self.build_dir,
-                                  project_fn = self.script_name )))
+                         self.re_sphinxbuild.sub(r'SPHINXBUILD = %s' % (self.build_command),
+                                                 BATCHFILE % dict(rsrcdir=self.source_dir,
+                                                                  rbuilddir=self.build_dir,
+                                                                  project_fn=self.script_name)))
 
         # 4. CREATE CUSTOM "sphinx-build" SCRIPT
         log.info('writing custom sphinx-builder script..')
@@ -137,25 +134,24 @@ class Recipe(object):
         #               'collective.recipe.sphinxbuilder:write', 'at', ':write')
         self.egg.name = self.options['recipe']
         requirements, ws = self.egg.working_set([self.options['recipe'], 'docutils'])
-        zc.buildout.easy_install.scripts(
-                [('sphinx-quickstart', 'sphinx.quickstart', 'main'),
-                 ('sphinx-build', 'sphinx', 'main'),
-                 ('sphinx-apidoc', 'sphinx.apidoc', 'main'),
-                 ('sphinx-autogen', 'sphinx.ext.autosummary.generate', 'main')], ws,
-                self.buildout[self.buildout['buildout']['python']]['executable'],
-                self.bin_dir, **egg_options)
+        zc.buildout.easy_install.scripts([('sphinx-quickstart', 'sphinx.quickstart', 'main'),
+                                          ('sphinx-build', 'sphinx', 'main'),
+                                          ('sphinx-apidoc', 'sphinx.apidoc', 'main'),
+                                          ('sphinx-autogen', 'sphinx.ext.autosummary.generate', 'main')], ws,
+                                         self.buildout[self.buildout['buildout']['python']]['executable'],
+                                         self.bin_dir, **egg_options)
 
         # patch sphinx-build script
         # change last line from sphinx.main() to sys.exit(sphinx.main())
-        # so that errors are correctly reported to Travis CI.        
+        # so that errors are correctly reported to Travis CI.
         sb = os.path.join(self.bin_dir, 'sphinx-build')
         temp_file = StringIO()
-        sb_file = open(sb,'r')
+        sb_file = open(sb, 'r')
         for line in sb_file:
             temp_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
-        # open for writing (delete contents existing contents before rewritng 
+        # open for writing (delete contents existing contents before rewriting
         # from StringIO that contains the modification
-        sb_file = open(sb,'w')
+        sb_file = open(sb, 'w')
         sb_file.write(temp_file.getvalue())
         temp_file.close()
         sb_file.close()
@@ -172,10 +168,10 @@ class Recipe(object):
         # check for namespace name (eg: my.package will resolve as my/package)
         # TODO
         namespace_packages = source[0].split('.')
-        if len(namespace_packages)>=1:
+        if len(namespace_packages) >= 1:
             source_directory = os.path.join(source_directory, *namespace_packages)
 
-        if len(source)==2:
+        if len(source) == 2:
             source_directory = os.path.join(source_directory, source[1])
         return source_directory
 
