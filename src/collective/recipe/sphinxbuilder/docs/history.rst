@@ -2,6 +2,12 @@
 Changes
 =======
 
+0.7.4 (2013-11-15)
+==================
+
+  - Update to Buildout 2
+  - Cleanup the code to make PEP8 tool happy
+
 0.7.3 (2013-02-16)
 ==================
 
