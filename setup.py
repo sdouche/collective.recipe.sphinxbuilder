@@ -60,8 +60,8 @@ setup(name='collective.recipe.sphinxbuilder',
             'zc.recipe.egg',
             'docutils',
             'Sphinx>=1.1'],
-      tests_require=['zope.testing', 'zc.buildout'],
-      extras_require=dict(tests=['zope.testing', 'zc.buildout']),
+      tests_require=['zope.testing', 'zc.buildout', 'manuel'],
+      extras_require=dict(tests=['zope.testing', 'zc.buildout', 'manuel']),
       test_suite = 'collective.recipe.sphinxbuilder.tests.test_docs.test_suite',
       entry_points = {"zc.buildout": ["default = collective.recipe.sphinxbuilder:Recipe"]}
       )
