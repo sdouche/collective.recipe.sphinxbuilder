@@ -147,7 +147,12 @@ class Recipe(object):
         temp_lines = []
         sb_file = open(sb, 'r')
         for line in sb_file:
-            temp_lines.append(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
+            if 'sphinx.main()' in line:
+                replacement = 'sys.exit(sphinx.main())'
+                if not replacement in line:
+                    # Buildout 2.x already includes sys.exit()
+                    line = line.replace('sphinx.main()', replacement)
+            temp_lines.append(line)
         # open for writing (which deletes existing contents before rewriting
         # from temp_lines that contains the modification)
         sb_file = open(sb, 'w')
