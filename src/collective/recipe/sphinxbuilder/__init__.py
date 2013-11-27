@@ -8,7 +8,10 @@ import sys
 import zc.buildout
 import zc.recipe.egg
 from fnmatch import fnmatch
-from cStringIO import StringIO
+try:
+    from io import StringIO  # Python 3
+except ImportError:
+    from cStringIO import StringIO  # Python 2
 
 log = logging.getLogger(__name__)
 
@@ -66,8 +69,8 @@ class Recipe(object):
                         extra_paths.append(filename)
             sys.path.extend(extra_paths)
 
-        from utils import MAKEFILE
-        from utils import BATCHFILE
+        from .utils import MAKEFILE
+        from .utils import BATCHFILE
 
         # and cleanup again
         if extra_paths:
@@ -108,7 +111,7 @@ class Recipe(object):
                 latex = 'make latex && '
             script.append(latex+'cd %s && make all-pdf' % os.path.join(self.build_dir, 'latex'))
         self._write_file(self.script_path, '\n'.join(script))
-        os.chmod(self.script_path, 0777)
+        os.chmod(self.script_path, 0o777)
 
         # 5. INSTALL SPHINX WITH SCRIPT AND EXTRA PATHS
 
