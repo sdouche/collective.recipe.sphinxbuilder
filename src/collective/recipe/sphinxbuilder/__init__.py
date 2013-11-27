@@ -8,7 +8,6 @@ import sys
 import zc.buildout
 import zc.recipe.egg
 from fnmatch import fnmatch
-from cStringIO import StringIO
 
 log = logging.getLogger(__name__)
 
@@ -66,8 +65,8 @@ class Recipe(object):
                         extra_paths.append(filename)
             sys.path.extend(extra_paths)
 
-        from utils import MAKEFILE
-        from utils import BATCHFILE
+        from .utils import MAKEFILE
+        from .utils import BATCHFILE
 
         # and cleanup again
         if extra_paths:
@@ -108,7 +107,7 @@ class Recipe(object):
                 latex = 'make latex && '
             script.append(latex+'cd %s && make all-pdf' % os.path.join(self.build_dir, 'latex'))
         self._write_file(self.script_path, '\n'.join(script))
-        os.chmod(self.script_path, 0777)
+        os.chmod(self.script_path, 0o777)
 
         # 5. INSTALL SPHINX WITH SCRIPT AND EXTRA PATHS
 
@@ -145,15 +144,20 @@ class Recipe(object):
         # change last line from sphinx.main() to sys.exit(sphinx.main())
         # so that errors are correctly reported to Travis CI.
         sb = os.path.join(self.bin_dir, 'sphinx-build')
-        temp_file = StringIO()
+        temp_lines = []
         sb_file = open(sb, 'r')
         for line in sb_file:
-            temp_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
-        # open for writing (delete contents existing contents before rewriting
-        # from StringIO that contains the modification
+            if 'sphinx.main()' in line:
+                replacement = 'sys.exit(sphinx.main())'
+                if not replacement in line:
+                    # Buildout 2.x already includes sys.exit()
+                    line = line.replace('sphinx.main()', replacement)
+            temp_lines.append(line)
+        # open for writing (which deletes existing contents before rewriting
+        # from temp_lines that contains the modification)
         sb_file = open(sb, 'w')
-        sb_file.write(temp_file.getvalue())
-        temp_file.close()
+        for line in temp_lines:
+            sb_file.write(line)
         sb_file.close()
 
         return [self.script_path, self.makefile_path, self.batchfile_path]

@@ -7,10 +7,14 @@ __docformat__ = 'restructuredtext'
 import doctest
 import pkg_resources
 import unittest
+import re
 import zc.buildout.tests
 import zc.buildout.testing
 from zope.testing import renormalizing
 
+
+# 'Not found: xyz' setuptools message suppressor. Copied from zc.buildout.
+not_found = (re.compile(r'Not found: [^\n]+/(\w|\.)+/\r?\n'), '')
 
 optionflags =  (doctest.ELLIPSIS |
                 doctest.NORMALIZE_WHITESPACE |
@@ -32,7 +36,7 @@ def get_dependent_dists(pkg):
         ]:
         result.append(name)
     return result
-                      
+
 
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
@@ -45,22 +49,23 @@ def setUp(test):
 
 def test_suite():
     suite = unittest.TestSuite((
-            doctest.DocFileSuite(
-                '../docs/usage.rst',
-                setUp=setUp,
-                tearDown=zc.buildout.testing.buildoutTearDown,
-                optionflags=optionflags,
-                checker=renormalizing.RENormalizing([
-                        # If want to clean up the doctest output you
-                        # can register additional regexp normalizers
-                        # here. The format is a two-tuple with the RE
-                        # as the first item and the replacement as the
-                        # second item, e.g.
-                        # (re.compile('my-[rR]eg[eE]ps'), 'my-regexps')
-                        zc.buildout.testing.normalize_path,
-                        ]),
-                ),
-            ))
+        doctest.DocFileSuite(
+            '../docs/usage.rst',
+            setUp=setUp,
+            tearDown=zc.buildout.testing.buildoutTearDown,
+            optionflags=optionflags,
+            checker=renormalizing.RENormalizing([
+                # If want to clean up the doctest output you
+                # can register additional regexp normalizers
+                # here. The format is a two-tuple with the RE
+                # as the first item and the replacement as the
+                # second item, e.g.
+                # (re.compile('my-[rR]eg[eE]ps'), 'my-regexps')
+                zc.buildout.testing.normalize_path,
+                not_found,
+            ]),
+        ),
+    ))
     return suite
 
 if __name__ == '__main__':
