@@ -8,4 +8,5 @@ Contributors
  * Hans-Peter Locher
  * Domen Kozar
  * Tres Seaver
+ * Reinout van Rees
  * Sébastien Douche, maintainer

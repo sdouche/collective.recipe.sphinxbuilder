@@ -3,7 +3,7 @@ Changes
 =======
 
 
-0.7.5 (unreleased)
+0.8.0 (2013-11-27)
 ==================
 
   - Added python 3 support [reinout]
