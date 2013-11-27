@@ -206,6 +206,7 @@ Again, we will skip running them, this time to avoid a recursive fork bomb. ;)
 
 If we want `extra-paths`, we can define them as normal paths or as unix
 wildcards (see `fnmatch` module) ::
+
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
