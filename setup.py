@@ -40,6 +40,8 @@ setup(name='collective.recipe.sphinxbuilder',
       classifiers=[
         'Framework :: Buildout',
         'Intended Audience :: Developers',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Build Tools',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: Zope Public License',
