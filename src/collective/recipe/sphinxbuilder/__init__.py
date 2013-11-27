@@ -8,10 +8,6 @@ import sys
 import zc.buildout
 import zc.recipe.egg
 from fnmatch import fnmatch
-try:
-    from io import StringIO  # Python 3
-except ImportError:
-    from cStringIO import StringIO  # Python 2
 
 log = logging.getLogger(__name__)
 
@@ -148,15 +144,15 @@ class Recipe(object):
         # change last line from sphinx.main() to sys.exit(sphinx.main())
         # so that errors are correctly reported to Travis CI.
         sb = os.path.join(self.bin_dir, 'sphinx-build')
-        temp_file = StringIO()
+        temp_lines = []
         sb_file = open(sb, 'r')
         for line in sb_file:
-            temp_file.write(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
-        # open for writing (delete contents existing contents before rewriting
-        # from StringIO that contains the modification
+            temp_lines.append(line.replace('sphinx.main()', 'sys.exit(sphinx.main())'))
+        # open for writing (which deletes existing contents before rewriting
+        # from temp_lines that contains the modification)
         sb_file = open(sb, 'w')
-        sb_file.write(temp_file.getvalue())
-        temp_file.close()
+        for line in temp_lines:
+            sb_file.write(line)
         sb_file.close()
 
         return [self.script_path, self.makefile_path, self.batchfile_path]
