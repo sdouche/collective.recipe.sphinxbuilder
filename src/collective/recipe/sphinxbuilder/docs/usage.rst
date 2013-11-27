@@ -81,7 +81,6 @@ If we want `latex`, we need to explicitly define it::
     collective.recipe.sphinxbuilder: writing MAKEFILE..
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
-    Generated script '/sample-buildout/bin/sphinx-build'.
     ...
 
 Let's see our script now::
@@ -126,7 +125,6 @@ If we want `pdf`, we need to explicitly define it::
     collective.recipe.sphinxbuilder: writing MAKEFILE..
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
-    Generated script '/sample-buildout/bin/sphinx-build'.
     ...
 
 Let's see our script now::
@@ -161,7 +159,6 @@ If we want `epub`, like pdf we need to explicitly define it::
     collective.recipe.sphinxbuilder: writing MAKEFILE..
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
-    Generated script '/sample-buildout/bin/sphinx-build'.
     ...
 
 Let's see our script now::
@@ -192,7 +189,6 @@ We can also have the script run any doctests in the docs while building::
     collective.recipe.sphinxbuilder: writing MAKEFILE..
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
-    Generated script '/sample-buildout/bin/sphinx-build'.
     ...
 
 Let's see our script now::
@@ -226,5 +222,4 @@ wildcards (see `fnmatch` module) ::
     collective.recipe.sphinxbuilder: writing BATCHFILE..
     collective.recipe.sphinxbuilder: writing custom sphinx-builder script..
     collective.recipe.sphinxbuilder: inserting extra-paths..
-    Generated script '/sample-buildout/bin/sphinx-build'.
     ...
