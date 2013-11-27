@@ -17,7 +17,7 @@ buildout that uses the recipe::
 
 Let's run the buildout::
 
-    >>> print('start', system(buildout))
+    >>> print('start ' + system(buildout))
     ... # doctest: +ELLIPSIS
     start Installing sphinxbuilder.
     collective.recipe.sphinxbuilder: writing MAKEFILE..
@@ -56,7 +56,7 @@ The content of the script is a simple shell script::
     cd ...docs
     make html
 
-    >>> print('start', system(script))
+    >>> print('start ' + system(script))
     start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees ...src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
     ...
 
@@ -74,7 +74,7 @@ If we want `latex`, we need to explicitly define it::
     ...     html
     ...     latex
     ... """)
-    >>> print('start', system(buildout))
+    >>> print('start ' + system(buildout))
     ... # doctest: +ELLIPSIS
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -93,7 +93,7 @@ Let's see our script now::
 
 Finally let's run it::
 
-    >>> print('start', system(script))
+    >>> print('start ' + system(script))
     start /sample-buildout/bin/sphinx-build -b html -d /sample-buildout/docs/doctrees   .../src/collective/recipe/sphinxbuilder/docs /sample-buildout/docs/html
     ...
     <BLANKLINE>
@@ -119,7 +119,7 @@ If we want `pdf`, we need to explicitly define it::
     ...     latex
     ...     pdf
     ... """)
-    >>> print('start', system(buildout))
+    >>> print('start ' + system(buildout))
     ... # doctest: +ELLIPSIS
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -154,7 +154,7 @@ If we want `epub`, like pdf we need to explicitly define it::
     ...     html
     ...     epub
     ... """)
-    >>> print('start', system(buildout))
+    >>> print('start ' + system(buildout))
     ... # doctest: +ELLIPSIS
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -185,7 +185,7 @@ We can also have the script run any doctests in the docs while building::
     ...     doctest
     ...     html
     ... """)
-    >>> print('start', system(buildout))
+    >>> print('start ' + system(buildout))
     ... # doctest: +ELLIPSIS
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
@@ -218,7 +218,7 @@ wildcards (see `fnmatch` module) ::
     ...     develop-eggs/
     ...     eggs/*
     ... """)
-    >>> print('start', system(buildout))
+    >>> print('start ' + system(buildout))
     ... # doctest: +ELLIPSIS
     start Uninstalling sphinxbuilder.
     Installing sphinxbuilder.
