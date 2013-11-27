@@ -2,6 +2,12 @@
 Changes
 =======
 
+
+0.7.5 (unreleased)
+==================
+
+  - Added python 3 support [reinout]
+
 0.7.4 (2013-11-15)
 ==================
 
@@ -93,4 +99,3 @@ Changes
 
  - Initial implementation [Tarek Ziade]
  - Created recipe with ZopeSkel [Tarek Ziade].
-
