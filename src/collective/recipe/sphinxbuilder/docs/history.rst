@@ -2,15 +2,15 @@
 Changes
 =======
 
+0.8.2 (2013-11-28)
+==================
+
+  - Prevent a warning when installing with python 3 [reinout]
+
 0.8.1 (2013-11-27)
 ==================
 
   - Add Python 3 classifier
-
-0.8.1 (unreleased)
-==================
-
-  - Prevent a warning when installing with python 3 [reinout]
 
 0.8.0 (2013-11-27)
 ==================
