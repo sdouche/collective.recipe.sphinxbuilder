@@ -7,6 +7,11 @@ Changes
 
   - Add Python 3 classifier
 
+0.8.1 (unreleased)
+==================
+
+  - Prevent a warning when installing with python 3 [reinout]
+
 0.8.0 (2013-11-27)
 ==================
 
